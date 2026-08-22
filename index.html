@@ -1,704 +1,351 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Mulya AI</title>
-<!-- Google Identity Services Library -->
-<script src="https://accounts.google.com/gsi/client" async defer></script>
-<style>
-* { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(100, 100, 100, 0.3); border-radius: 10px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(100, 100, 100, 0.5); }
-
-:root {
-    --bg-color: #ffffff;
-    --text-color: #1f1f1f;
-    --sidebar-bg: #f0f4f9;
-    --sidebar-border: #e3e3e3;
-    --hover-bg: #e2e8f0;
-    --active-bg: #d3e3fd;
-    --active-text: #001d35;
-    --input-bg: #f0f4f9;
-    --input-border: transparent;
-    --input-focus-bg: #fff;
-    --user-bubble-bg: #f0f4f9;
-    --user-bubble-text: #1f1f1f;
-    --footer-text: #747775;
-    --modal-bg: #ffffff;
-}
-
-body.dark-theme {
-    --bg-color: #131314;
-    --text-color: #e3e3e3;
-    --sidebar-bg: #1e1f20;
-    --sidebar-border: #333537;
-    --hover-bg: #2d2f31;
-    --active-bg: #004a77;
-    --active-text: #c2e7ff;
-    --input-bg: #1e1f20;
-    --input-border: #444746;
-    --input-focus-bg: #1e1f20;
-    --user-bubble-bg: #282a2c;
-    --user-bubble-text: #e3e3e3;
-    --footer-text: #9aa0a6;
-    --modal-bg: #1e1f20;
-}
-
-body { display: flex; height: 100vh; height: 100dvh; background-color: var(--bg-color); color: var(--text-color); overflow: hidden; position: relative; }
-
-.mobile-header { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 60px; background: var(--bg-color); border-bottom: 1px solid var(--sidebar-border); z-index: 90; align-items: center; justify-content: space-between; padding: 0 16px; }
-.menu-toggle-btn { background: transparent; border: none; font-size: 22px; color: var(--text-color); cursor: pointer; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; }
-.menu-toggle-btn:hover { background: var(--hover-bg); }
-.mobile-title { font-weight: 600; font-size: 16px; background: linear-gradient(45deg, #4285f4, #9b72cb); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-
-.login-header-btn { position: absolute; top: 16px; right: 20px; z-index: 100; }
-.login-btn-custom { background: #4285f4; color: white; border: none; padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 500; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: 0.2s; display: flex; align-items: center; gap: 6px; }
-.login-btn-custom:hover { opacity: 0.9; }
-
-.sidebar-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 95; backdrop-filter: blur(2px); }
-
-.sidebar { width: 280px; background-color: var(--sidebar-bg); display: flex; flex-direction: column; justify-content: space-between; padding: 16px; border-right: 1px solid var(--sidebar-border); z-index: 99; flex-shrink: 0; }
-.sidebar-top { display: flex; flex-direction: column; gap: 16px; flex: 1; overflow: hidden; }
-.new-chat-btn { display: flex; align-items: center; gap: 10px; background: var(--active-bg); color: var(--active-text); border: none; padding: 12px 16px; border-radius: 24px; font-weight: 500; cursor: pointer; font-size: 14px; width: fit-content; flex-shrink: 0; }
-.new-chat-btn:hover { opacity: 0.9; }
-.brand { display: flex; align-items: center; gap: 10px; font-weight: 500; font-size: 18px; color: var(--text-color); padding-left: 4px; flex-shrink: 0; }
-.brand span { background: linear-gradient(45deg, #4285f4, #9b72cb, #d96570); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: bold; }
-
-.history-list { overflow-y: auto; display: flex; flex-direction: column; gap: 4px; margin-top: 6px; padding-right: 4px; flex: 1; }
-.history-item { padding: 10px 14px; border-radius: 16px; font-size: 13px; color: var(--text-color); cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; background: transparent; border: none; text-align: left; width: 100%; }
-.history-item:hover { background: var(--hover-bg); }
-.history-item.active { background: var(--active-bg); color: var(--active-text); font-weight: 500; }
-.history-title-label { font-size: 11px; font-weight: bold; color: var(--footer-text); padding-left: 10px; margin-bottom: 4px; text-transform: uppercase; }
-
-.sidebar-bottom { display: flex; flex-direction: column; gap: 8px; border-top: 1px solid var(--sidebar-border); padding-top: 12px; }
-.creator-badge { font-size: 11px; color: var(--footer-text); padding-left: 10px; margin-bottom: 2px; font-weight: 500; }
-.user-profile { display: flex; align-items: center; justify-content: space-between; font-size: 13px; color: var(--text-color); font-weight: 500; }
-.logout-btn { background: transparent; border: none; color: #d93025; font-size: 12px; cursor: pointer; }
-.logout-btn:hover { text-decoration: underline; }
-.settings-btn { display: flex; align-items: center; gap: 8px; background: transparent; border: none; color: var(--text-color); font-size: 13px; padding: 8px 10px; border-radius: 8px; cursor: pointer; width: 100%; text-align: left; font-weight: 500; }
-.settings-btn:hover { background: var(--hover-bg); }
-
-#settingsModal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 999; padding: 16px; }
-.settings-card { background: var(--modal-bg); color: var(--text-color); width: 100%; max-width: 400px; border-radius: 16px; padding: 24px; box-shadow: 0 8px 24px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto; }
-.settings-card h3 { font-size: 18px; margin-bottom: 20px; font-weight: 600; }
-.setting-group { margin-bottom: 16px; }
-.setting-group label { display: block; font-size: 13px; color: var(--footer-text); margin-bottom: 6px; }
-.setting-group select { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--sidebar-border); background: var(--bg-color); color: var(--text-color); font-size: 14px; outline: none; cursor: pointer; }
-.settings-footer { display: flex; justify-content: flex-end; margin-top: 24px; }
-.close-settings-btn { background: var(--active-bg); color: var(--active-text); border: none; padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 500; cursor: pointer; }
-
-.main-container { flex: 1; display: flex; flex-direction: column; justify-content: space-between; height: 100vh; height: 100dvh; position: relative; overflow: hidden; }
-#welcome-screen { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; }
-.welcome-title { font-size: 32px; font-weight: 500; background: linear-gradient(90deg, #4285f4, #9b72cb); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 10px; line-height: 1.3; max-width: 600px; }
-.welcome-subtitle { font-size: 15px; color: var(--footer-text); margin-bottom: 20px; }
-
-#chat-history { flex: 1; overflow-y: auto; padding: 24px 15%; display: none; flex-direction: column; gap: 24px; scroll-behavior: smooth; }
-.message-row { display: flex; gap: 14px; align-items: flex-start; max-width: 100%; }
-.message-row.user { justify-content: flex-end; }
-.avatar { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: bold; flex-shrink: 0; }
-.avatar.ai-av { background: linear-gradient(45deg, #4285f4, #9b72cb); color: white; }
-.avatar.user-av { background: var(--text-color); color: var(--bg-color); }
-.message-row.user .bubble { background: var(--user-bubble-bg); color: var(--user-bubble-text); padding: 10px 16px; border-radius: 16px; border-top-right-radius: 4px; max-width: 75%; word-break: break-word; white-space: pre-wrap; font-size: 15px; line-height: 1.6; }
-.message-row.ai .bubble { background: transparent; color: var(--text-color); padding: 0; width: 100%; word-break: break-word; white-space: pre-wrap; font-size: 15px; line-height: 1.6; }
-
-.uploaded-img-preview { max-width: 200px; max-height: 200px; border-radius: 8px; margin-bottom: 8px; display: block; object-fit: cover; }
-.ai-generated-image { max-width: 100%; max-height: 400px; border-radius: 12px; margin-top: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: block; object-fit: contain; }
-.download-img-btn { display: inline-block; margin-top: 8px; padding: 6px 14px; background: #4285f4; color: white; border-radius: 20px; font-size: 12px; text-decoration: none; font-weight: 500; }
-.download-img-btn:hover { opacity: 0.9; }
-
-.input-area-wrapper { padding: 15px 15% 25px 15%; background: linear-gradient(180deg, rgba(0,0,0,0) 0%, var(--bg-color) 80%); }
-.input-box { display: flex; flex-direction: column; background: var(--input-bg); border-radius: 24px; padding: 8px 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); border: 1px solid var(--input-border); }
-.input-box:focus-within { border-color: #4285f4; background: var(--input-focus-bg); box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
-.input-actions-row { display: flex; align-items: center; width: 100%; gap: 8px; }
-textarea { flex: 1; background: transparent; border: none; outline: none; font-size: 15px; resize: none; max-height: 120px; color: var(--text-color); padding: 4px 6px; }
-.attach-btn { background: transparent; border: none; font-size: 20px; color: var(--footer-text); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; flex-shrink: 0; }
-.attach-btn:hover { background: var(--hover-bg); color: var(--text-color); }
-.send-btn { background: var(--text-color); color: var(--bg-color); border: none; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; flex-shrink: 0; }
-.send-btn:hover { opacity: 0.8; }
-.footer-note { font-size: 11px; color: var(--footer-text); text-align: center; margin-top: 8px; }
-
-#imagePreviewContainer { display: none; align-items: center; gap: 8px; padding: 6px 10px; border-bottom: 1px solid var(--sidebar-border); margin-bottom: 6px; }
-#imagePreviewThumbnail { width: 40px; height: 40px; border-radius: 6px; object-fit: cover; }
-#imagePreviewName { font-size: 12px; color: var(--text-color); flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.remove-img-btn { background: transparent; border: none; color: #d93025; font-size: 16px; cursor: pointer; padding: 4px; }
-
-@media (max-width: 1024px) {
-    #chat-history { padding: 24px 8%; }
-    .input-area-wrapper { padding: 15px 8% 20px 8%; }
-}
-
-@media (max-width: 768px) {
-    .mobile-header { display: flex; }
-    .login-header-btn { top: 12px; right: 16px; }
-    .sidebar { position: fixed; top: 0; left: 0; height: 100%; transform: translateX(-100%); box-shadow: 4px 0 16px rgba(0,0,0,0.15); transition: transform 0.3s ease; }
-    .sidebar.mobile-open { transform: translateX(0); }
-    .sidebar-overlay.active { display: block; }
-    .main-container { padding-top: 60px; }
-    #chat-history { padding: 16px 4%; gap: 16px; }
-    .input-area-wrapper { padding: 10px 4% 16px 4%; }
-    .welcome-title { font-size: 24px; padding: 0 10px; }
-    .message-row.user .bubble { max-width: 85%; }
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mulya AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
 </head>
-<body>
+<body class="bg-slate-50 text-slate-800 h-screen flex flex-col overflow-hidden">
 
-<div class="mobile-header">
-    <button class="menu-toggle-btn" onclick="toggleSidebar()">☰</button>
-    <div class="mobile-title">✨ Mulya AI</div>
-    <div style="width: 40px;"></div>
-</div>
-
-<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
-
-<div id="loginBtnContainer" class="login-header-btn">
-    <button class="login-btn-custom" onclick="handleGoogleLogin()">
-        <svg width="16" height="16" viewBox="0 0 24 24"><path fill="#ffffff" d="M12 5c1.6 0 3 .6 4.1 1.6l3.1-3.1C17.3 1.8 14.8 1 12 1 7.4 1 3.5 3.6 1.6 7.4l3.7 2.9C6.2 7.1 8.9 5 12 5z"/><path fill="#ffffff" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.6h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.9z"/><path fill="#ffffff" d="M5.3 14.7c-.2-.8-.4-1.7-.4-2.7s.2-1.9.4-2.7L1.6 6.4C.6 8.4 0 10.6 0 13s.6 4.6 1.6 6.6l3.7-2.9z"/><path fill="#ffffff" d="M12 23c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3.1 0-5.8-2.1-6.7-5.3L1.6 15.9C3.5 19.7 7.4 23 12 23z"/></svg>
-        Login Google
-    </button>
-</div>
-
-<div id="settingsModal">
-    <div class="settings-card">
-        <h3 id="setModalTitle">Pengaturan</h3>
-        <div class="setting-group">
-            <label id="setThemeLabel">Tema</label>
-            <select id="themeSelect" onchange="changeTheme()">
-                <option value="light">Terang (Light)</option>
-                <option value="dark">Gelap (Dark)</option>
-            </select>
-        </div>
-        <div class="setting-group">
-            <label id="setLangLabel">Bahasa Tampilan Aplikasi</label>
-            <select id="langSelect" onchange="changeLanguage()">
-                <option value="id">Indonesia</option>
-                <option value="en">English</option>
-            </select>
-        </div>
-        <div class="setting-group">
-            <label id="setChatLangLabel">Bahasa Respon Chat AI</label>
-            <select id="chatLangSelect" onchange="changeChatLanguage()">
-                <option value="id">Bahasa Indonesia</option>
-                <option value="en">English</option>
-            </select>
-        </div>
-        <div class="setting-group">
-            <label id="setAiRoleLabel">Peran / Mode Asisten AI</label>
-            <select id="aiRoleSelect" onchange="changeAiRole()">
-                <option value="general">Asisten Serba Bisa (General Assistant)</option>
-                <option value="coder">Ahli Pemrograman / Coder (HTML, JS, Audio API, dll)</option>
-                <option value="writer">Penulis Kreatif & Konten (Cerita, Pidato, Artikel)</option>
-                <option value="teacher">Guru / Mentor Edukasi (Penjelas Materi Sekolah)</option>
-                <option value="audio_expert">Ahli Sound System & Audio Profesional</option>
-            </select>
-        </div>
-        <div class="settings-footer">
-            <button class="close-settings-btn" onclick="closeSettings()" id="setCloseBtn">Tutup</button>
+    <!-- Modal Login / Masuk Nama -->
+    <div id="loginModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 text-center">
+            <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-2xl mx-auto flex items-center justify-center text-2xl font-bold mb-4">✨</div>
+            <h2 class="text-2xl font-bold text-slate-900 mb-2">Selamat Datang di Mulya AI</h2>
+            <p class="text-slate-500 text-sm mb-6">Masukkan nama kamu untuk mulai menggunakan asisten AI.</p>
+            <input type="text" id="userNameInput" placeholder="Ketik nama kamu di sini..." class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4 text-sm">
+            <button onclick="handleLogin()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl transition duration-200 shadow-lg shadow-blue-500/25">Mulai Percakapan</button>
         </div>
     </div>
-</div>
 
-<div class="sidebar" id="appSidebar">
-    <div class="sidebar-top">
-        <div class="brand">✨ <span>Mulya AI</span></div>
-        <button class="new-chat-btn" onclick="startNewChat()" id="newChatBtn">＋ Percakapan baru</button>
+    <!-- Layout Utama -->
+    <div class="flex h-full w-full overflow-hidden">
         
-        <div style="margin-top: 10px; display: flex; flex-direction: column; flex: 1; overflow: hidden;">
-            <div class="history-title-label" id="historyLabel">Riwayat</div>
-            <div class="history-list" id="chatHistoryList"></div>
-        </div>
-    </div>
-    
-    <div class="sidebar-bottom">
-        <div class="creator-badge">By: Alip Dwi Nugroho</div>
-        <button class="settings-btn" onclick="openSettings()">⚙️ <span id="settingsMenuText">Pengaturan</span></button>
-        <div class="user-profile" id="userProfileSection" style="display: none;">
-            <span id="displayUserName">Akun</span>
-            <button class="logout-btn" onclick="handleLogout()" id="logoutBtnText">Keluar</button>
-        </div>
-    </div>
-</div>
+        <!-- Sidebar Riwayat -->
+        <aside id="sidebar" class="w-72 bg-white border-r border-slate-200 flex flex-col justify-between transition-all duration-300 z-20">
+            <div class="p-4 flex flex-col h-full">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 bg-blue-600 text-white rounded-xl flex items-center justify-center font-bold text-sm">✨</div>
+                        <span class="font-bold text-lg text-slate-900">Mulya AI</span>
+                    </div>
+                </div>
 
-<div class="main-container">
-    <div id="welcome-screen">
-        <div class="welcome-title" id="welcomeGreeting">Perkenalkan Mulya AI, asisten AI pribadi Anda</div>
-        <div class="welcome-subtitle" id="welcomeSub">Silakan Login Google terlebih dahulu di pojok kanan atas untuk mulai menggunakan AI.</div>
-    </div>
+                <button onclick="startNewChat()" class="flex items-center justify-center gap-2 w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium py-3 px-4 rounded-xl transition text-sm mb-4">
+                    <span>+ Percakapan baru</span>
+                </button>
 
-    <div id="chat-history"></div>
+                <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Riwayat</div>
+                <div id="history-list" class="flex-1 overflow-y-auto hide-scrollbar space-y-1 pr-1">
+                    <!-- Daftar riwayat chat akan masuk sini -->
+                </div>
 
-    <div class="input-area-wrapper">
-        <div class="input-box" id="inputBoxContainer" style="opacity: 0.5; pointer-events: none;">
-            <div id="imagePreviewContainer">
-                <img id="imagePreviewThumbnail" src="" alt="Preview">
-                <span id="imagePreviewName"></span>
-                <button class="remove-img-btn" onclick="removeAttachedImage()">✕</button>
+                <!-- Footer Sidebar -->
+                <div class="border-t border-slate-100 pt-4 mt-2">
+                    <div class="flex items-center justify-between text-xs text-slate-500 mb-3 px-1">
+                        <span id="displayUserName">User</span>
+                        <button onclick="handleLogout()" class="text-rose-600 hover:underline">Keluar</button>
+                    </div>
+                </div>
             </div>
-            <div class="input-actions-row">
-                <input type="file" id="imageInput" accept="image/*" style="display: none;" onchange="handleImageUpload(event)">
-                <button class="attach-btn" id="attachBtn" disabled onclick="document.getElementById('imageInput').click()" title="Upload Gambar">＋</button>
-                <textarea id="userInput" placeholder="Silakan Login Google terlebih dahulu..." rows="1" disabled onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
-                <button class="send-btn" id="sendBtn" disabled onclick="sendMessage()">➤</button>
+        </aside>
+
+        <!-- Area Chat Utama -->
+        <main class="flex-1 flex flex-col h-full bg-slate-50 relative">
+            <!-- Header Chat -->
+            <header class="h-16 border-b border-slate-200 bg-white/80 backdrop-blur-md flex items-center justify-between px-6 z-10">
+                <div class="flex items-center gap-3">
+                    <h1 id="currentChatTitle" class="font-semibold text-slate-800 text-base">Percakapan Baru</h1>
+                </div>
+            </header>
+
+            <!-- Pesan / Chat History Container -->
+            <div id="chat-history" class="flex-1 overflow-y-auto p-4 md:p-6 space-y-6">
+                <!-- Sambutan Awal jika belum ada pesan -->
+                <div id="welcome-screen" class="h-full flex flex-col items-center justify-center text-center max-w-md mx-auto">
+                    <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-3xl flex items-center justify-center text-3xl mb-4 shadow-sm">✨</div>
+                    <h2 class="text-xl font-bold text-slate-800 mb-2">Ada yang bisa Mulya AI bantu hari ini?</h2>
+                    <p class="text-slate-500 text-sm">Ketik pertanyaan, minta buatkan kode, atau upload gambar tugas untuk dianalisis.</p>
+                </div>
             </div>
-        </div>
-        <div class="footer-note" id="footerNoteText">Mulya AI dapat menampilkan info yang tidak akurat. Verifikasi respons penting.</div>
+
+            <!-- Preview Gambar yang Di-upload -->
+            <div id="imagePreviewContainer" class="hidden px-6 py-2 bg-white border-t border-slate-100 flex items-center gap-3">
+                <div class="relative w-16 h-16 rounded-lg overflow-hidden border border-slate-200">
+                    <img id="previewImg" src="" class="w-full h-full object-cover">
+                    <button onclick="removeAttachedImage()" class="absolute top-1 right-1 bg-slate-900/70 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-rose-600">&times;</button>
+                </div>
+                <span class="text-xs text-slate-500">Gambar siap dikirim...</span>
+            </div>
+
+            <!-- Input Chat Area -->
+            <div class="p-4 md:p-6 bg-gradient-to-t from-slate-50 via-slate-50 to-transparent">
+                <div class="max-w-4xl mx-auto bg-white border border-slate-200 rounded-2xl shadow-sm focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent flex items-end p-2 transition">
+                    <input type="file" id="imageInput" accept="image/*" class="hidden" onchange="handleImageUpload(event)">
+                    <button onclick="document.getElementById('imageInput').click()" class="p-2.5 text-slate-400 hover:text-blue-600 transition rounded-xl hover:bg-slate-50" title="Upload Gambar">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg>
+                    </button>
+                    <textarea id="userInput" rows="1" placeholder="Minta Mulya AI atau upload gambar..." class="flex-1 max-h-32 p-2.5 border-0 focus:outline-none resize-none text-sm text-slate-800 placeholder-slate-400 hide-scrollbar" onkeydown="handleKeyDown(event)"></textarea>
+                    <button onclick="sendMessage()" class="bg-slate-900 hover:bg-blue-600 text-white p-2.5 rounded-xl transition duration-200 ml-2 shadow-md">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M12 5l7 7-7 7"></path></svg>
+                    </button>
+                </div>
+                <div class="text-center mt-2 text-xs text-slate-400">Mulya AI dapat menampilkan info yang tidak akurat. Verifikasi respons penting.</div>
+            </div>
+        </main>
     </div>
-</div>
 
-<script>
-const apiKey = "AQ.Ab8RN6L9tlupKy9xDbfV03WEssoxs2zuaB1J_uCl67SQfWMZ5g";
-const googleClientId = "860718785165-1ir3kis2ggepql33ot5m5eo1j8s3k884.apps.googleusercontent.com";
+    <script>
+        // Konfigurasi API & State Global
+        const apiKey = "AQ.Ab8RN6L9tlupKy9xDbfV03WEssoxs2zuaB1J_uCl67SQfWMZ5g"; // Masukkan API Key Google Gemini Anda
+        let currentUserName = localStorage.getItem("mulya_ai_user") || "";
+        let allChats = JSON.parse(localStorage.getItem("mulya_ai_chats") || "[]");
+        let currentChatId = null;
+        let attachedImageBase64 = null;
+        let chatLang = "id";
+        let translations = {
+            id: { thinking: "Sedang berpikir...", error: "Maaf, terjadi kesalahan.", connectionError: "Gagal terhubung ke server." },
+            en: { thinking: "Thinking...", error: "Sorry, an error occurred.", connectionError: "Failed to connect to server." }
+        };
 
-let allChats = [];
-let currentChatId = null;
-let currentUserName = "";
-let currentLang = "id";
-let chatLang = "id";
-let aiRole = "general";
-let tokenClient;
-let attachedImageBase64 = null;
+        // Inisialisasi saat halaman dimuat
+        window.onload = () => {
+            if (!currentUserName) {
+                document.getElementById("loginModal").classList.remove("hidden");
+            } else {
+                document.getElementById("displayUserName").textContent = currentUserName;
+                document.getElementById("loginModal").classList.add("hidden");
+                if (allChats.length > 0) {
+                    loadChat(allChats[0].id);
+                } else {
+                    startNewChat();
+                }
+            }
+        };
 
-const translations = {
-    id: {
-        newChat: "＋ Percakapan baru",
-        history: "Riwayat",
-        settings: "Pengaturan",
-        logout: "Keluar",
-        welcome: "Perkenalkan Mulya AI, asisten AI pribadi Anda",
-        welcomeSubLogin: "Silakan Login Google terlebih dahulu di pojok kanan atas untuk mulai menggunakan AI.",
-        placeholderLogin: "Silakan Login Google terlebih dahulu...",
-        placeholderReady: "Minta Mulya AI atau buat gambar (cth: buat gambar...)...",
-        footer: "Mulya AI dapat menampilkan info yang tidak akurat. Verifikasi respons penting.",
-        thinking: "Berpikir & Memproses...",
-        error: "Maaf, terjadi kesalahan.",
-        connectionError: "Gagal terhubung.",
-        modalTitle: "Pengaturan",
-        themeLabel: "Tema",
-        langLabel: "Bahasa Tampilan Aplikasi",
-        chatLangLabel: "Bahasa Respon Chat AI",
-        aiRoleLabel: "Peran / Mode Asisten AI",
-        closeBtn: "Tutup",
-        newChatTitle: "Percakapan Baru"
-    },
-    en: {
-        newChat: "＋ New chat",
-        history: "History",
-        settings: "Settings",
-        logout: "Log out",
-        welcome: "Meet Mulya AI, your personal assistant",
-        welcomeSubLogin: "Please log in with Google at the top right to start using AI.",
-        placeholderLogin: "Please log in with Google first...",
-        placeholderReady: "Ask Mulya AI or generate image (e.g., generate image...)....",
-        footer: "Mulya AI may display inaccurate info. Verify important responses.",
-        thinking: "Thinking & Processing...",
-        error: "Sorry, an error occurred.",
-        connectionError: "Connection failed.",
-        modalTitle: "Settings",
-        themeLabel: "Theme",
-        langLabel: "App Interface Language",
-        chatLangLabel: "AI Chat Response Language",
-        aiRoleLabel: "AI Assistant Role / Mode",
-        closeBtn: "Close",
-        newChatTitle: "New Chat"
-    }
-};
+        function handleLogin() {
+            const nameInput = document.getElementById("userNameInput").value.trim();
+            if (!nameInput) return alert("Silakan masukkan nama kamu!");
+            currentUserName = nameInput;
+            localStorage.setItem("mulya_ai_user", currentUserName);
+            document.getElementById("displayUserName").textContent = currentUserName;
+            document.getElementById("loginModal").classList.add("hidden");
+            startNewChat();
+        }
 
-window.onload = function () {
-    if (typeof google !== 'undefined' && google.accounts) {
-        tokenClient = google.accounts.oauth2.initTokenClient({
-            client_id: googleClientId,
-            scope: 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email',
-            callback: (response) => {
-                if (response && response.access_token) {
-                    fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
-                        headers: { 'Authorization': 'Bearer ' + response.access_token }
-                    })
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data && data.name) {
-                            currentUserName = data.name;
-                            localStorage.setItem("mulya_username", currentUserName);
-                            setLoggedInState();
-                        }
+        function handleLogout() {
+            localStorage.removeItem("mulya_ai_user");
+            location.reload();
+        }
+
+        function startNewChat() {
+            const newChat = {
+                id: 'chat_' + Date.now(),
+                title: 'Percakapan Baru',
+                messages: []
+            };
+            allChats.unshift(newChat);
+            saveChatsToStorage();
+            loadChat(newChat.id);
+            renderHistoryList();
+        }
+
+        function loadChat(chatId) {
+            currentChatId = chatId;
+            renderCurrentChat();
+            renderHistoryList();
+        }
+
+        function saveChatsToStorage() {
+            localStorage.setItem("mulya_ai_chats", JSON.stringify(allChats));
+        }
+
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                attachedImageBase64 = e.target.result;
+                document.getElementById("previewImg").src = attachedImageBase64;
+                document.getElementById("imagePreviewContainer").classList.remove("hidden");
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function removeAttachedImage() {
+            attachedImageBase64 = null;
+            document.getElementById("imageInput").value = "";
+            document.getElementById("imagePreviewContainer").classList.add("hidden");
+        }
+
+        function handleKeyDown(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        }
+
+        function renderHistoryList() {
+            const list = document.getElementById("history-list");
+            list.innerHTML = "";
+            allChats.forEach(chat => {
+                const isActive = chat.id === currentChatId;
+                list.innerHTML += `
+                    <div onclick="loadChat('${chat.id}')" class="group flex items-center justify-between px-3 py-2.5 rounded-xl cursor-pointer text-sm font-medium transition ${isActive ? 'bg-blue-50 text-blue-600' : 'text-slate-600 hover:bg-slate-100'}">
+                        <span class="truncate pr-2">${chat.title}</span>
+                        <button onclick="deleteChat(event, '${chat.id}')" class="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-rose-600 text-xs p-1">&times;</button>
+                    </div>`;
+            });
+        }
+
+        function deleteChat(e, chatId) {
+            e.stopPropagation();
+            allChats = allChats.filter(c => c.id !== chatId);
+            saveChatsToStorage();
+            if (currentChatId === chatId) {
+                if (allChats.length > 0) loadChat(allChats[0].id);
+                else startNewChat();
+            } else {
+                renderHistoryList();
+            }
+        }
+
+        function renderCurrentChat() {
+            const chatHistoryDiv = document.getElementById("chat-history");
+            const currentChat = allChats.find(c => c.id === currentChatId);
+            
+            if (!currentChat || currentChat.messages.length === 0) {
+                chatHistoryDiv.innerHTML = `
+                    <div class="h-full flex flex-col items-center justify-center text-center max-w-md mx-auto">
+                        <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-3xl flex items-center justify-center text-3xl mb-4 shadow-sm">✨</div>
+                        <h2 class="text-xl font-bold text-slate-800 mb-2">Ada yang bisa Mulya AI bantu hari ini?</h2>
+                        <p class="text-slate-500 text-sm">Ketik pertanyaan, minta buatkan kode, atau upload gambar tugas untuk dianalisis.</p>
+                    </div>`;
+                document.getElementById("currentChatTitle").textContent = "Percakapan Baru";
+                return;
+            }
+
+            document.getElementById("currentChatTitle").textContent = currentChat.title;
+            let html = "";
+            currentChat.messages.forEach(m => {
+                if (m.role === "user") {
+                    html += `
+                        <div class="flex flex-col items-end mb-4">
+                            ${m.imageUrl ? `<div class="mb-2 max-w-xs rounded-xl overflow-hidden border border-slate-200"><img src="${m.imageUrl}" class="w-full object-cover"></div>` : ''}
+                            <div class="bg-blue-600 text-white px-4 py-3 rounded-2xl rounded-tr-none max-w-lg text-sm shadow-sm whitespace-pre-wrap">${m.content}</div>
+                        </div>`;
+                } else {
+                    html += `
+                        <div class="flex items-start gap-3 mb-4">
+                            <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center text-xs font-bold shadow-sm shrink-0">✨</div>
+                            <div class="bg-white border border-slate-200 text-slate-800 px-4 py-3 rounded-2xl rounded-tl-none max-w-2xl text-sm shadow-sm whitespace-pre-wrap">${m.content}</div>
+                        </div>`;
+                }
+            });
+            chatHistoryDiv.innerHTML = html;
+            chatHistoryDiv.scrollTop = chatHistoryDiv.scrollHeight;
+        }
+
+        // Fungsi Utama Kirim Pesan & Gambar ke Gemini API
+        async function sendMessage() {
+            if (!currentUserName) return;
+            const input = document.getElementById("userInput");
+            const text = input.value.trim();
+            const activeImg = attachedImageBase64;
+
+            if (!text && !activeImg) return;
+
+            if (!currentChatId || allChats.length === 0) startNewChat();
+
+            const currentChat = allChats.find(c => c.id === currentChatId);
+            if (currentChat.messages.length === 0) {
+                let titleText = text ? text : "Analisis Gambar";
+                currentChat.title = titleText.length > 20 ? titleText.substring(0, 20) + "..." : titleText;
+                renderHistoryList();
+            }
+
+            currentChat.messages.push({ role: "user", content: text || "Tolong analisis gambar ini.", imageUrl: activeImg });
+            saveChatsToStorage();
+            
+            input.value = "";
+            input.style.height = 'auto';
+            removeAttachedImage();
+            renderCurrentChat();
+
+            const historyDiv = document.getElementById("chat-history");
+            const aiId = "ai-resp-" + Date.now();
+            const t = translations[chatLang];
+            historyDiv.innerHTML += `
+                <div class="flex items-start gap-3 mb-4" id="${aiId}">
+                    <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center text-xs font-bold shadow-sm shrink-0">✨</div>
+                    <div class="bg-white border border-slate-200 text-slate-800 px-4 py-3 rounded-2xl rounded-tl-none max-w-2xl text-sm shadow-sm">${t.thinking}</div>
+                </div>`;
+            historyDiv.scrollTop = historyDiv.scrollHeight;
+
+            let contents = [];
+            currentChat.messages.slice(0, -1).forEach(m => {
+                if (m.role === "user") {
+                    contents.push({ role: "user", parts: [{ text: m.content }] });
+                } else if (m.role === "assistant") {
+                    contents.push({ role: "model", parts: [{ text: m.content }] });
+                }
+            });
+
+            let latestParts = [];
+            if (activeImg) {
+                let match = activeImg.match(/^data:(image\/[a-zA-Z+]+);base64,(.+)$/);
+                if (match) {
+                    latestParts.push({ 
+                        inline_data: { 
+                            mime_type: match[1], 
+                            data: match[2] 
+                        } 
                     });
                 }
             }
-        });
-    }
-};
+            latestParts.push({ text: text || "Tolong analisis gambar ini." });
+            contents.push({ role: "user", parts: latestParts });
 
-function handleGoogleLogin() {
-    if (tokenClient) {
-        tokenClient.requestAccessToken();
-    } else {
-        alert("Google Identity belum siap. Coba refresh halaman beberapa saat lagi.");
-    }
-}
+            let langInstruction = chatLang === "en" ? "You must always reply in English." : "Kamu harus selalu merespons menggunakan Bahasa Indonesia.";
 
-function setLoggedInState() {
-    document.getElementById("loginBtnContainer").style.display = "none";
-    document.getElementById("userProfileSection").style.display = "flex";
-    document.getElementById("displayUserName").textContent = currentUserName;
-    
-    const inputBox = document.getElementById("inputBoxContainer");
-    inputBox.style.opacity = "1";
-    inputBox.style.pointerEvents = "auto";
-    document.getElementById("userInput").disabled = false;
-    document.getElementById("sendBtn").disabled = false;
-    document.getElementById("attachBtn").disabled = false;
+            try {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        system_instruction: { parts: [{ text: langInstruction }] },
+                        contents: contents
+                    })
+                });
 
-    updateTexts();
-    if (allChats.length === 0) startNewChat();
-}
+                const data = await response.json();
+                const aiBubble = document.querySelector(`#${aiId} .bg-white`);
 
-function toggleSidebar() {
-    const sidebar = document.getElementById("appSidebar");
-    const overlay = document.getElementById("sidebarOverlay");
-    sidebar.classList.toggle("mobile-open");
-    overlay.classList.toggle("active");
-}
-
-function autoResize(textarea) {
-    textarea.style.height = 'auto';
-    textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
-}
-
-function handleImageUpload(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        attachedImageBase64 = e.target.result;
-        document.getElementById("imagePreviewThumbnail").src = attachedImageBase64;
-        document.getElementById("imagePreviewName").textContent = file.name;
-        document.getElementById("imagePreviewContainer").style.display = "flex";
-    };
-    reader.readAsDataURL(file);
-}
-
-function removeAttachedImage() {
-    attachedImageBase64 = null;
-    document.getElementById("imagePreviewContainer").style.display = "none";
-    document.getElementById("imageInput").value = "";
-}
-
-function updateTexts() {
-    const t = translations[currentLang];
-    document.getElementById("newChatBtn").textContent = t.newChat;
-    document.getElementById("historyLabel").textContent = t.history;
-    document.getElementById("settingsMenuText").textContent = t.settings;
-    document.getElementById("logoutBtnText").textContent = t.logout;
-    document.getElementById("footerNoteText").textContent = t.footer;
-    document.getElementById("setModalTitle").textContent = t.modalTitle;
-    document.getElementById("setThemeLabel").textContent = t.themeLabel;
-    document.getElementById("setLangLabel").textContent = t.langLabel;
-    document.getElementById("setChatLangLabel").textContent = t.chatLangLabel;
-    document.getElementById("setAiRoleLabel").textContent = t.aiRoleLabel;
-    document.getElementById("setCloseBtn").textContent = t.closeBtn;
-    
-    if (!currentUserName) {
-        document.getElementById("welcomeGreeting").textContent = t.welcome;
-        document.getElementById("welcomeSub").textContent = t.welcomeSubLogin;
-        document.getElementById("userInput").placeholder = t.placeholderLogin;
-    } else {
-        document.getElementById("welcomeGreeting").textContent = currentLang === 'id' ? `Halo, ${currentUserName}! Ada yang bisa dibantu hari ini?` : `Hello, ${currentUserName}! How can I help you today?`;
-        document.getElementById("welcomeSub").textContent = "";
-        document.getElementById("userInput").placeholder = t.placeholderReady;
-    }
-}
-
-function openSettings() {
-    document.getElementById("settingsModal").style.display = "flex";
-}
-
-function closeSettings() {
-    document.getElementById("settingsModal").style.display = "none";
-}
-
-function changeTheme() {
-    const theme = document.getElementById("themeSelect").value;
-    localStorage.setItem("mulya_theme", theme);
-    if (theme === "dark") {
-        document.body.classList.add("dark-theme");
-    } else {
-        document.body.classList.remove("dark-theme");
-    }
-}
-
-function changeLanguage() {
-    currentLang = document.getElementById("langSelect").value;
-    localStorage.setItem("mulya_lang", currentLang);
-    updateTexts();
-}
-
-function changeChatLanguage() {
-    chatLang = document.getElementById("chatLangSelect").value;
-    localStorage.setItem("mulya_chat_lang", chatLang);
-}
-
-function changeAiRole() {
-    aiRole = document.getElementById("aiRoleSelect").value;
-    localStorage.setItem("mulya_ai_role", aiRole);
-}
-
-window.addEventListener("DOMContentLoaded", () => {
-    const savedTheme = localStorage.getItem("mulya_theme") || "light";
-    document.getElementById("themeSelect").value = savedTheme;
-    if (savedTheme === "dark") document.body.classList.add("dark-theme");
-
-    const savedLang = localStorage.getItem("mulya_lang") || "id";
-    document.getElementById("langSelect").value = savedLang;
-    currentLang = savedLang;
-
-    const savedChatLang = localStorage.getItem("mulya_chat_lang") || "id";
-    document.getElementById("chatLangSelect").value = savedChatLang;
-    chatLang = savedChatLang;
-
-    const savedAiRole = localStorage.getItem("mulya_ai_role") || "general";
-    document.getElementById("aiRoleSelect").value = savedAiRole;
-    aiRole = savedAiRole;
-
-    updateTexts();
-
-    const savedUser = localStorage.getItem("mulya_username");
-    if (savedUser) {
-        currentUserName = savedUser;
-        setLoggedInState();
-    }
-});
-
-function handleLogout() {
-    currentUserName = "";
-    localStorage.removeItem("mulya_username");
-    document.getElementById("loginBtnContainer").style.display = "block";
-    document.getElementById("userProfileSection").style.display = "none";
-    
-    const inputBox = document.getElementById("inputBoxContainer");
-    inputBox.style.opacity = "0.5";
-    inputBox.style.pointerEvents = "none";
-    document.getElementById("userInput").disabled = true;
-    document.getElementById("sendBtn").disabled = true;
-    document.getElementById("attachBtn").disabled = true;
-
-    updateTexts();
-    location.reload();
-}
-
-function startNewChat() {
-    if (!currentUserName) return;
-    currentChatId = Date.now();
-    const t = translations[currentLang];
-    allChats.push({ id: currentChatId, title: t.newChatTitle, messages: [] });
-    renderHistoryList();
-    renderCurrentChat();
-    if (window.innerWidth <= 768) {
-        document.getElementById("appSidebar").classList.remove("mobile-open");
-        document.getElementById("sidebarOverlay").classList.remove("active");
-    }
-}
-
-function renderHistoryList() {
-    const listEl = document.getElementById("chatHistoryList");
-    listEl.innerHTML = "";
-    allChats.forEach(chat => {
-        const btn = document.createElement("button");
-        btn.className = "history-item" + (chat.id === currentChatId ? " active" : "");
-        btn.textContent = chat.title;
-        btn.onclick = () => {
-            switchChat(chat.id);
-            if (window.innerWidth <= 768) {
-                document.getElementById("appSidebar").classList.remove("mobile-open");
-                document.getElementById("sidebarOverlay").classList.remove("active");
-            }
-        };
-        listEl.appendChild(btn);
-    });
-}
-
-function switchChat(id) {
-    currentChatId = id;
-    renderHistoryList();
-    renderCurrentChat();
-}
-
-function renderCurrentChat() {
-    const historyDiv = document.getElementById("chat-history");
-    const welcomeScreen = document.getElementById("welcome-screen");
-    historyDiv.innerHTML = "";
-
-    const currentChat = allChats.find(c => c.id === currentChatId);
-    if (!currentChat || currentChat.messages.length === 0) {
-        welcomeScreen.style.display = "flex";
-        historyDiv.style.display = "none";
-        return;
-    }
-
-    welcomeScreen.style.display = "none";
-    historyDiv.style.display = "flex";
-
-    currentChat.messages.forEach(msg => {
-        if (msg.role === "user") {
-            let imgHtml = msg.imageUrl ? `<img src="${msg.imageUrl}" class="uploaded-img-preview" alt="Uploaded">` : "";
-            historyDiv.innerHTML += `
-                <div class="message-row user">
-                    <div class="bubble">${imgHtml}${escapeHtml(msg.content)}</div>
-                    <div class="avatar user-av">${currentUserName ? currentUserName.charAt(0).toUpperCase() : 'U'}</div>
-                </div>`;
-        } else {
-            let contentHtml = msg.content;
-            if (msg.isImage) {
-                contentHtml = `
-                    <div>${escapeHtml(msg.textResponse)}</div>
-                    <img src="${msg.imageUrl}" class="ai-generated-image" alt="Generated Image" />
-                    <a href="${msg.imageUrl}" target="_blank" download="mulya-ai-image.jpg" class="download-img-btn">⬇ Download Gambar</a>
-                `;
-            } else {
-                contentHtml = escapeHtml(msg.content);
-            }
-
-            historyDiv.innerHTML += `
-                <div class="message-row ai">
-                    <div class="avatar ai-av">✨</div>
-                    <div class="bubble">${contentHtml}</div>
-                </div>`;
-        }
-    });
-    historyDiv.scrollTop = historyDiv.scrollHeight;
-}
-
-function escapeHtml(text) {
-    if (!text) return "";
-    return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
-}
-
-function handleKey(event) {
-    if (event.key === "Enter" && !event.shiftKey) {
-        event.preventDefault();
-        sendMessage();
-    }
-}
-
-async function sendMessage() {
-    if (!currentUserName) return;
-    const input = document.getElementById("userInput");
-    const text = input.value.trim();
-    const activeImg = attachedImageBase64;
-
-    if (!text && !activeImg) return;
-
-    if (!currentChatId || allChats.length === 0) startNewChat();
-
-    const currentChat = allChats.find(c => c.id === currentChatId);
-    if (currentChat.messages.length === 0) {
-        let titleText = text ? text : "Analisis Gambar";
-        currentChat.title = titleText.length > 20 ? titleText.substring(0, 20) + "..." : titleText;
-        renderHistoryList();
-    }
-
-    currentChat.messages.push({ role: "user", content: text || "Tolong analisis gambar ini.", imageUrl: activeImg });
-    
-    input.value = "";
-    input.style.height = 'auto';
-    removeAttachedImage();
-    renderCurrentChat();
-
-    const historyDiv = document.getElementById("chat-history");
-    const aiId = "ai-resp-" + Date.now();
-    const t = translations[currentLang];
-    historyDiv.innerHTML += `
-        <div class="message-row ai" id="${aiId}">
-            <div class="avatar ai-av">✨</div>
-            <div class="bubble">${t.thinking}</div>
-        </div>`;
-    historyDiv.scrollTop = historyDiv.scrollHeight;
-
-    const lowerText = text.toLowerCase();
-    const isImageRequest = !activeImg && (lowerText.includes("buat gambar") || lowerText.includes("bikin gambar") || lowerText.includes("generate image") || lowerText.includes("lukiskan"));
-
-    if (isImageRequest) {
-        let imagePrompt = text.replace(/buat gambar|bikin gambar|generate image|lukiskan/gi, "").trim();
-        if (!imagePrompt) imagePrompt = text;
-        let imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(imagePrompt)}?width=1024&height=1024&nologo=true`;
-        
-        setTimeout(() => {
-            let textResponse = chatLang === "en" ? `Here is the image you requested based on: "${imagePrompt}"` : `Berikut adalah hasil gambar yang kamu minta berdasarkan: "${imagePrompt}"`;
-            currentChat.messages.push({ role: "assistant", content: textResponse, isImage: true, textResponse, imageUrl });
-            renderCurrentChat();
-        }, 1000);
-        return;
-    }
-
-    let langInstruction = chatLang === "en" ? "You must always reply in English." : "Kamu harus selalu merespons menggunakan Bahasa Indonesia.";
-    let roleInstruction = "";
-    if (aiRole === "coder") roleInstruction = "Anda adalah Ahli Pemrograman / Coder berpengalaman yang sangat paham HTML, JavaScript, Web Audio API, dan koding sistem.";
-    else if (aiRole === "writer") roleInstruction = "Anda adalah Penulis Kreatif dan Konten yang handal dalam merangkai kata, cerita, dan pidato.";
-    else if (aiRole === "teacher") roleInstruction = "Anda adalah Guru dan Mentor Edukasi yang sabar menjelaskan materi sekolah dengan jelas.";
-    else if (aiRole === "audio_expert") roleInstruction = "Anda adalah Ahli Sound System Profesional dan Teknisi Audio yang paham power amplifier, mixer, crossover, dan akustik speaker.";
-
-    // Format payload agar mendukung pengiriman teks dan gambar ke endpoint Gemini
-    let contents = [];
-    
-    // Masukkan riwayat chat sebelumnya agar percakapan nyambung
-    currentChat.messages.slice(0, -1).forEach(m => {
-        if (m.role === "user") {
-            let parts = [];
-            if (m.imageUrl) {
-                let match = m.imageUrl.match(/^data:(image\/[a-zA-Z+]+);base64,(.+)$/);
-                if (match) {
-                    parts.push({ inline_data: { mime_type: match[1], data: match[2] } });
+                if (data.candidates && data.candidates[0].content.parts[0].text) {
+                    const replyText = data.candidates[0].content.parts[0].text;
+                    aiBubble.textContent = replyText;
+                    currentChat.messages.push({ role: "assistant", content: replyText });
+                    saveChatsToStorage();
+                } else {
+                    console.error("API Error Response:", data);
+                    aiBubble.textContent = t.error;
+                    currentChat.messages.push({ role: "assistant", content: t.error });
                 }
+            } catch (err) {
+                console.error("Fetch Error:", err);
+                const aiBubble = document.querySelector(`#${aiId} .bg-white`);
+                if (aiBubble) aiBubble.textContent = t.connectionError;
+                currentChat.messages.push({ role: "assistant", content: t.connectionError });
             }
-            parts.push({ text: m.content });
-            contents.push({ role: "user", parts: parts });
-        } else if (m.role === "assistant") {
-            contents.push({ role: "model", parts: [{ text: m.content || m.textResponse || "" }] });
+            renderCurrentChat();
         }
-    });
-
-    // Pesan terbaru user
-    let latestParts = [];
-    if (activeImg) {
-        let match = activeImg.match(/^data:(image\/[a-zA-Z+]+);base64,(.+)$/);
-        if (match) {
-            latestParts.push({ inline_data: { mime_type: match[1], data: match[2] } });
-        }
-    }
-    latestParts.push({ text: text || "Tolong analisis gambar ini." });
-    contents.push({ role: "user", parts: latestParts });
-
-    try {
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                system_instruction: { parts: [{ text: `${langInstruction} ${roleInstruction}` }] },
-                contents: contents
-            })
-        });
-
-        const data = await response.json();
-        const aiBubble = document.querySelector(`#${aiId} .bubble`);
-
-        if (data.candidates && data.candidates[0].content.parts[0].text) {
-            const replyText = data.candidates[0].content.parts[0].text;
-            aiBubble.textContent = replyText;
-            currentChat.messages.push({ role: "assistant", content: replyText });
-        } else {
-            aiBubble.textContent = t.error;
-            currentChat.messages.push({ role: "assistant", content: t.error });
-        }
-    } catch (err) {
-        const aiBubble = document.querySelector(`#${aiId} .bubble`);
-        if (aiBubble) aiBubble.textContent = t.connectionError;
-        currentChat.messages.push({ role: "assistant", content: t.connectionError });
-    }
-    renderCurrentChat();
-}
-</script>
+    </script>
 </body>
 </html>
