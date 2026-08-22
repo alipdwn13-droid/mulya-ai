@@ -7,11 +7,23 @@
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
 
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(100, 100, 100, 0.3); border-radius: 10px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(100, 100, 100, 0.5); }
+/* Styling Scrollbar Modern & Elegan */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: rgba(100, 100, 100, 0.3);
+    border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(100, 100, 100, 0.5);
+}
 
+/* Variabel Tema Terang (Default) */
 :root {
     --bg-color: #ffffff;
     --text-color: #1f1f1f;
@@ -29,6 +41,7 @@
     --modal-bg: #ffffff;
 }
 
+/* Variabel Tema Gelap */
 body.dark-theme {
     --bg-color: #131314;
     --text-color: #e3e3e3;
@@ -46,8 +59,9 @@ body.dark-theme {
     --modal-bg: #1e1f20;
 }
 
-body { display: flex; height: 100vh; height: 100dvh; background-color: var(--bg-color); color: var(--text-color); overflow: hidden; position: relative; }
+body { display: flex; height: 100vh; height: 100dvh; background-color: var(--bg-color); color: var(--text-color); overflow: hidden; transition: background 0.2s, color 0.2s; position: relative; }
 
+/* Tombol Menu Mobile (Hamburger) & Login Header */
 .mobile-header { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 60px; background: var(--bg-color); border-bottom: 1px solid var(--sidebar-border); z-index: 90; align-items: center; justify-content: space-between; padding: 0 16px; }
 .menu-toggle-btn { background: transparent; border: none; font-size: 22px; color: var(--text-color); cursor: pointer; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; }
 .menu-toggle-btn:hover { background: var(--hover-bg); }
@@ -57,21 +71,25 @@ body { display: flex; height: 100vh; height: 100dvh; background-color: var(--bg-
 .login-btn-custom { background: #4285f4; color: white; border: none; padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 500; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: 0.2s; }
 .login-btn-custom:hover { opacity: 0.9; }
 
+/* Overlay untuk HP saat sidebar terbuka */
 .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 95; backdrop-filter: blur(2px); }
 
-.sidebar { width: 280px; background-color: var(--sidebar-bg); display: flex; flex-direction: column; justify-content: space-between; padding: 16px; border-right: 1px solid var(--sidebar-border); z-index: 99; flex-shrink: 0; }
+/* Sidebar Kiri */
+.sidebar { width: 280px; background-color: var(--sidebar-bg); display: flex; flex-direction: column; justify-content: space-between; padding: 16px; border-right: 1px solid var(--sidebar-border); transition: transform 0.3s ease, background 0.2s, border 0.2s; z-index: 99; flex-shrink: 0; }
 .sidebar-top { display: flex; flex-direction: column; gap: 16px; flex: 1; overflow: hidden; }
 .new-chat-btn { display: flex; align-items: center; gap: 10px; background: var(--active-bg); color: var(--active-text); border: none; padding: 12px 16px; border-radius: 24px; font-weight: 500; cursor: pointer; font-size: 14px; width: fit-content; flex-shrink: 0; }
 .new-chat-btn:hover { opacity: 0.9; }
 .brand { display: flex; align-items: center; gap: 10px; font-weight: 500; font-size: 18px; color: var(--text-color); padding-left: 4px; flex-shrink: 0; }
 .brand span { background: linear-gradient(45deg, #4285f4, #9b72cb, #d96570); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: bold; }
 
+/* List Riwayat Chat */
 .history-list { overflow-y: auto; display: flex; flex-direction: column; gap: 4px; margin-top: 6px; padding-right: 4px; flex: 1; }
 .history-item { padding: 10px 14px; border-radius: 16px; font-size: 13px; color: var(--text-color); cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; background: transparent; border: none; text-align: left; width: 100%; }
 .history-item:hover { background: var(--hover-bg); }
 .history-item.active { background: var(--active-bg); color: var(--active-text); font-weight: 500; }
 .history-title-label { font-size: 11px; font-weight: bold; color: var(--footer-text); padding-left: 10px; margin-bottom: 4px; text-transform: uppercase; }
 
+/* Menu Bawah Sidebar (Profil & Pengaturan) */
 .sidebar-bottom { display: flex; flex-direction: column; gap: 8px; border-top: 1px solid var(--sidebar-border); padding-top: 12px; }
 .creator-badge { font-size: 11px; color: var(--footer-text); padding-left: 10px; margin-bottom: 2px; font-weight: 500; }
 .user-profile { display: flex; align-items: center; justify-content: space-between; font-size: 13px; color: var(--text-color); font-weight: 500; }
@@ -80,6 +98,7 @@ body { display: flex; height: 100vh; height: 100dvh; background-color: var(--bg-
 .settings-btn { display: flex; align-items: center; gap: 8px; background: transparent; border: none; color: var(--text-color); font-size: 13px; padding: 8px 10px; border-radius: 8px; cursor: pointer; width: 100%; text-align: left; font-weight: 500; }
 .settings-btn:hover { background: var(--hover-bg); }
 
+/* Modal Pengaturan */
 #settingsModal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 999; padding: 16px; }
 .settings-card { background: var(--modal-bg); color: var(--text-color); width: 100%; max-width: 400px; border-radius: 16px; padding: 24px; box-shadow: 0 8px 24px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto; }
 .settings-card h3 { font-size: 18px; margin-bottom: 20px; font-weight: 600; }
@@ -89,6 +108,7 @@ body { display: flex; height: 100vh; height: 100dvh; background-color: var(--bg-
 .settings-footer { display: flex; justify-content: flex-end; margin-top: 24px; }
 .close-settings-btn { background: var(--active-bg); color: var(--active-text); border: none; padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 500; cursor: pointer; }
 
+/* Area Utama */
 .main-container { flex: 1; display: flex; flex-direction: column; justify-content: space-between; height: 100vh; height: 100dvh; position: relative; overflow: hidden; }
 #welcome-screen { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; }
 .welcome-title { font-size: 32px; font-weight: 500; background: linear-gradient(90deg, #4285f4, #9b72cb); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 30px; line-height: 1.3; max-width: 600px; }
@@ -99,9 +119,11 @@ body { display: flex; height: 100vh; height: 100dvh; background-color: var(--bg-
 .avatar { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: bold; flex-shrink: 0; }
 .avatar.ai-av { background: linear-gradient(45deg, #4285f4, #9b72cb); color: white; }
 .avatar.user-av { background: var(--text-color); color: var(--bg-color); }
-.message-row.user .bubble { background: var(--user-bubble-bg); color: var(--user-bubble-text); padding: 10px 16px; border-radius: 16px; border-top-right-radius: 4px; max-width: 75%; word-break: break-word; white-space: pre-wrap; font-size: 15px; line-height: 1.6; }
-.message-row.ai .bubble { background: transparent; color: var(--text-color); padding: 0; width: 100%; word-break: break-word; white-space: pre-wrap; font-size: 15px; line-height: 1.6; }
+.bubble { padding: 4px 0; border-radius: 16px; font-size: 15px; line-height: 1.6; max-width: 80%; word-break: break-word; white-space: pre-wrap; }
+.message-row.user .bubble { background: var(--user-bubble-bg); color: var(--user-bubble-text); padding: 10px 16px; border-top-right-radius: 4px; max-width: 75%; }
+.message-row.ai .bubble { background: transparent; color: var(--text-color); padding: 0; width: 100%; }
 
+/* Styling Gambar Hasil AI */
 .ai-generated-image { max-width: 100%; max-height: 400px; border-radius: 12px; margin-top: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: block; object-fit: contain; }
 .download-img-btn { display: inline-block; margin-top: 8px; padding: 6px 14px; background: #4285f4; color: white; border-radius: 20px; font-size: 12px; text-decoration: none; font-weight: 500; }
 .download-img-btn:hover { opacity: 0.9; }
@@ -112,8 +134,10 @@ body { display: flex; height: 100vh; height: 100dvh; background-color: var(--bg-
 textarea { flex: 1; background: transparent; border: none; outline: none; font-size: 15px; resize: none; max-height: 120px; color: var(--text-color); padding: 4px 6px; }
 .send-btn { background: var(--text-color); color: var(--bg-color); border: none; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; flex-shrink: 0; }
 .send-btn:hover { opacity: 0.8; }
+
 .footer-note { font-size: 11px; color: var(--footer-text); text-align: center; margin-top: 8px; }
 
+/* MEDIA QUERIES UNTUK RESPONSIVITAS SEMPURNA */
 @media (max-width: 1024px) {
     #chat-history { padding: 24px 8%; }
     .input-area-wrapper { padding: 15px 8% 20px 8%; }
@@ -122,10 +146,28 @@ textarea { flex: 1; background: transparent; border: none; outline: none; font-s
 @media (max-width: 768px) {
     .mobile-header { display: flex; }
     .login-header-btn { top: 12px; right: 16px; }
-    .sidebar { position: fixed; top: 0; left: 0; height: 100%; transform: translateX(-100%); box-shadow: 4px 0 16px rgba(0,0,0,0.15); transition: transform 0.3s ease; }
-    .sidebar.mobile-open { transform: translateX(0); }
-    .sidebar-overlay.active { display: block; }
-    .main-container { padding-top: 60px; }
+    
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100%;
+        transform: translateX(-100%);
+        box-shadow: 4px 0 16px rgba(0,0,0,0.15);
+    }
+    
+    .sidebar.mobile-open {
+        transform: translateX(0);
+    }
+
+    .sidebar-overlay.active {
+        display: block;
+    }
+
+    .main-container {
+        padding-top: 60px;
+    }
+
     #chat-history { padding: 16px 4%; gap: 16px; }
     .input-area-wrapper { padding: 10px 4% 16px 4%; }
     .welcome-title { font-size: 24px; padding: 0 10px; }
@@ -135,18 +177,22 @@ textarea { flex: 1; background: transparent; border: none; outline: none; font-s
 </head>
 <body>
 
+<!-- Header Khusus Tampilan Mobile (HP) -->
 <div class="mobile-header">
     <button class="menu-toggle-btn" onclick="toggleSidebar()">☰</button>
     <div class="mobile-title">✨ Mulya AI</div>
     <div style="width: 40px;"></div>
 </div>
 
+<!-- Overlay Sidebar HP -->
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
+<!-- Tombol Masuk Akun Manual (Bebas Error Origin Mismatch) -->
 <div id="loginBtnContainer" class="login-header-btn">
     <button class="login-btn-custom" onclick="promptLogin()">🔑 Masuk Akun</button>
 </div>
 
+<!-- Modal Pengaturan -->
 <div id="settingsModal">
     <div class="settings-card">
         <h3 id="setModalTitle">Pengaturan</h3>
@@ -187,6 +233,7 @@ textarea { flex: 1; background: transparent; border: none; outline: none; font-s
     </div>
 </div>
 
+<!-- Sidebar -->
 <div class="sidebar" id="appSidebar">
     <div class="sidebar-top">
         <div class="brand">✨ <span>Mulya AI</span></div>
@@ -208,6 +255,7 @@ textarea { flex: 1; background: transparent; border: none; outline: none; font-s
     </div>
 </div>
 
+<!-- Konten Utama -->
 <div class="main-container">
     <div id="welcome-screen">
         <div class="welcome-title" id="welcomeGreeting">Perkenalkan Mulya AI, asisten AI pribadi Anda</div>
@@ -345,7 +393,9 @@ function changeAiRole() {
 window.addEventListener("DOMContentLoaded", () => {
     const savedTheme = localStorage.getItem("mulya_theme") || "light";
     document.getElementById("themeSelect").value = savedTheme;
-    if (savedTheme === "dark") document.body.classList.add("dark-theme");
+    if (savedTheme === "dark") {
+        document.body.classList.add("dark-theme");
+    }
 
     const savedLang = localStorage.getItem("mulya_lang") || "id";
     document.getElementById("langSelect").value = savedLang;
@@ -376,17 +426,22 @@ function promptLogin() {
     if (name && name.trim() !== "") {
         currentUserName = name.trim();
         localStorage.setItem("mulya_username", currentUserName);
+        
         document.getElementById("loginBtnContainer").style.display = "none";
         document.getElementById("userProfileSection").style.display = "flex";
         document.getElementById("displayUserName").textContent = currentUserName;
         updateTexts();
-        if (allChats.length === 0) startNewChat();
+        
+        if (allChats.length === 0) {
+            startNewChat();
+        }
     }
 }
 
 function handleLogout() {
     currentUserName = "";
     localStorage.removeItem("mulya_username");
+    
     document.getElementById("loginBtnContainer").style.display = "block";
     document.getElementById("userProfileSection").style.display = "none";
     updateTexts();
@@ -399,9 +454,12 @@ function startNewChat() {
     allChats.push({ id: currentChatId, title: t.newChatTitle, messages: [] });
     renderHistoryList();
     renderCurrentChat();
+    
     if (window.innerWidth <= 768) {
-        document.getElementById("appSidebar").classList.remove("mobile-open");
-        document.getElementById("sidebarOverlay").classList.remove("active");
+        const sidebar = document.getElementById("appSidebar");
+        const overlay = document.getElementById("sidebarOverlay");
+        sidebar.classList.remove("mobile-open");
+        overlay.classList.remove("active");
     }
 }
 
@@ -415,8 +473,10 @@ function renderHistoryList() {
         btn.onclick = () => {
             switchChat(chat.id);
             if (window.innerWidth <= 768) {
-                document.getElementById("appSidebar").classList.remove("mobile-open");
-                document.getElementById("sidebarOverlay").classList.remove("active");
+                const sidebar = document.getElementById("appSidebar");
+                const overlay = document.getElementById("sidebarOverlay");
+                sidebar.classList.remove("mobile-open");
+                overlay.classList.remove("active");
             }
         };
         listEl.appendChild(btn);
@@ -478,9 +538,12 @@ function sendMessage() {
     const text = input.value.trim();
     if (!text) return;
 
-    if (!currentChatId || allChats.length === 0) startNewChat();
+    if (!currentChatId || allChats.length === 0) {
+        startNewChat();
+    }
 
     const currentChat = allChats.find(c => c.id === currentChatId);
+    
     if (currentChat.messages.length === 0) {
         currentChat.title = text.length > 20 ? text.substring(0, 20) + "..." : text;
         renderHistoryList();
@@ -507,11 +570,20 @@ function sendMessage() {
     if (isImageRequest) {
         let imagePrompt = text.replace(/buat gambar|bikin gambar|generate image|lukiskan/gi, "").trim();
         if (!imagePrompt) imagePrompt = text;
-        let imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(imagePrompt)}?width=1024&height=1024&nologo=true`;
+        
+        let encodedPrompt = encodeURIComponent(imagePrompt);
+        let imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=1024&height=1024&nologo=true`;
         
         setTimeout(() => {
             let textResponse = chatLang === "en" ? `Here is the image you requested based on: "${imagePrompt}"` : `Berikut adalah hasil gambar yang kamu minta berdasarkan: "${imagePrompt}"`;
-            currentChat.messages.push({ role: "assistant", content: textResponse, isImage: true, textResponse, imageUrl });
+            
+            currentChat.messages.push({ 
+                role: "assistant", 
+                content: textResponse, 
+                isImage: true, 
+                textResponse: textResponse, 
+                imageUrl: imageUrl 
+            });
             renderCurrentChat();
         }, 1000);
         return;
@@ -519,11 +591,20 @@ function sendMessage() {
 
     let langInstruction = chatLang === "en" ? "You must always reply in English." : "Kamu harus selalu merespons menggunakan Bahasa Indonesia.";
     let roleInstruction = "";
-    if (aiRole === "coder") roleInstruction = " Bertindaklah sebagai Ahli Pemrograman/Developer profesional.";
-    else if (aiRole === "writer") roleInstruction = " Bertindaklah sebagai Penulis Kreatif profesional.";
-    else if (aiRole === "teacher") roleInstruction = " Bertindaklah sebagai Guru atau Mentor yang sabar dan pintar.";
-    else if (aiRole === "audio_expert") roleInstruction = " Bertindaklah sebagai Ahli Sound System & Perangkat Audio Profesional.";
-    else roleInstruction = " Bertindaklah sebagai Asisten AI pribadi yang cerdas dan serba bisa.";
+    if (aiRole === "coder") {
+        roleInstruction = " Bertindaklah sebagai Ahli Pemrograman/Developer profesional. Berikan kode yang bersih, efisien, dan lengkap.";
+    } else if (aiRole === "writer") {
+        roleInstruction = " Bertindaklah sebagai Penulis Kreatif profesional.";
+    } else if (aiRole === "teacher") {
+        roleInstruction = " Bertindaklah sebagai Guru atau Mentor yang sabar dan pintar.";
+    } else if (aiRole === "audio_expert") {
+        roleInstruction = " Bertindaklah sebagai Ahli Sound System & Perangkat Audio Profesional.";
+    } else {
+        roleInstruction = " Bertindaklah sebagai Asisten AI pribadi yang cerdas dan serba bisa.";
+    }
+
+    let systemInstruction = { role: "system", content: langInstruction + roleInstruction };
+    let apiMessages = [systemInstruction, ...currentChat.messages.map(m => ({ role: m.role, content: m.content }))];
 
     fetch("https://openrouter.ai/api/v1/chat/completions", {
         method: "POST",
@@ -535,13 +616,14 @@ function sendMessage() {
         },
         body: JSON.stringify({ 
             model: "openrouter/auto", 
-            messages: [{ role: "system", content: langInstruction + roleInstruction }, ...currentChat.messages.map(m => ({ role: m.role, content: m.content }))] 
+            messages: apiMessages 
         })
     })
     .then(res => res.json())
     .then(data => {
         if (data.choices && data.choices.length > 0) {
-            currentChat.messages.push({ role: "assistant", content: data.choices[0].message.content, isImage: false });
+            const reply = data.choices[0].message.content;
+            currentChat.messages.push({ role: "assistant", content: reply, isImage: false });
             renderCurrentChat();
         } else {
             document.getElementById(aiId).querySelector(".bubble").textContent = t.error;
@@ -553,7 +635,10 @@ function sendMessage() {
 }
 
 function handleKey(e) {
-    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+    if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+    }
 }
 
 function escapeHtml(text) {
