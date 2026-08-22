@@ -112,7 +112,6 @@ body { display: flex; height: 100vh; height: 100dvh; background-color: var(--bg-
 
 .input-area-wrapper { padding: 15px 15% 25px 15%; background: linear-gradient(180deg, rgba(0,0,0,0) 0%, var(--bg-color) 80%); }
 
-/* Image Preview Container above input */
 #imagePreviewContainer { display: none; align-items: center; gap: 10px; background: var(--sidebar-bg); padding: 8px 12px; border-radius: 12px; margin-bottom: 8px; width: fit-content; border: 1px solid var(--sidebar-border); }
 #imagePreviewContainer img { width: 40px; height: 40px; object-fit: cover; border-radius: 6px; }
 #imagePreviewContainer span { font-size: 13px; font-weight: 500; color: var(--text-color); }
@@ -171,7 +170,7 @@ textarea { flex: 1; background: transparent; border: none; outline: none; font-s
     </button>
 </div>
 
-<!-- Hidden File Inputs for Gallery and Camera -->
+<!-- Hidden File Inputs -->
 <input type="file" id="galleryInput" accept="image/*" style="display:none;" onchange="handleImageSelected(event)">
 <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none;" onchange="handleImageSelected(event)">
 
@@ -288,9 +287,9 @@ const translations = {
         welcome: "Perkenalkan Mulya AI, asisten AI pribadi Anda",
         welcomeSubLogin: "Silakan Login Google terlebih dahulu di pojok kanan atas untuk mulai menggunakan AI.",
         placeholderLogin: "Silakan Login Google terlebih dahulu...",
-        placeholderReady: "Minta Mulya AI atau buat gambar (cth: buat gambar...)...",
+        placeholderReady: "Kirim pesan atau tanya foto yang diambil dari kamera...",
         footer: "Mulya AI dapat menampilkan info yang tidak akurat. Verifikasi respons penting.",
-        thinking: "Berpikir & Memproses Gambar...",
+        thinking: "Sedang menganalisis gambar & berpikir...",
         error: "Maaf, terjadi kesalahan.",
         connectionError: "Gagal terhubung.",
         modalTitle: "Pengaturan",
@@ -309,9 +308,9 @@ const translations = {
         welcome: "Meet Mulya AI, your personal assistant",
         welcomeSubLogin: "Please log in with Google at the top right to start using AI.",
         placeholderLogin: "Please log in with Google first...",
-        placeholderReady: "Ask Mulya AI or generate image (e.g., generate image...)....",
+        placeholderReady: "Type a message or ask about the camera photo...",
         footer: "Mulya AI may display inaccurate info. Verify important responses.",
-        thinking: "Thinking & Generating Image...",
+        thinking: "Analyzing image & thinking...",
         error: "Sorry, an error occurred.",
         connectionError: "Connection failed.",
         modalTitle: "Settings",
@@ -400,7 +399,7 @@ function handleImageSelected(event) {
     reader.onload = function(e) {
         attachedImageBase64 = e.target.result;
         document.getElementById("previewImgElement").src = attachedImageBase64;
-        document.getElementById("previewImgName").textContent = file.name || "Gambar Terlampir";
+        document.getElementById("previewImgName").textContent = file.name || "Foto Kamera";
         document.getElementById("imagePreviewContainer").style.display = "flex";
     };
     reader.readAsDataURL(file);
@@ -619,14 +618,15 @@ function sendMessage() {
 
     const currentChat = allChats.find(c => c.id === currentChatId);
     if (currentChat.messages.length === 0) {
-        let titleText = text ? (text.length > 20 ? text.substring(0, 20) + "..." : text) : "Lampiran Gambar";
+        let titleText = text ? (text.length > 20 ? text.substring(0, 20) + "..." : text) : "Foto Kamera";
         currentChat.title = titleText;
         renderHistoryList();
     }
 
+    const defaultPrompt = chatLang === "en" ? "Please describe and answer what is in this photo." : "Tolong jelaskan dan jawab apa yang ada di foto/kamera ini.";
     const messagePayload = { 
         role: "user", 
-        content: text || (chatLang === "en" ? "Analyze this image." : "Tolonganalisis gambar ini."), 
+        content: text || defaultPrompt, 
         userImage: attachedImageBase64 
     };
 
@@ -686,6 +686,7 @@ function sendMessage() {
         }
     });
 
+    // Menggunakan model Google Gemini 2.0 Flash yang mendukung Vision (Analisis Gambar & Kamera) secara stabil di OpenRouter
     fetch("https://openrouter.ai/api/v1/chat/completions", {
         method: "POST",
         headers: { 
@@ -695,7 +696,7 @@ function sendMessage() {
             "X-Title": "Mulya AI"
         },
         body: JSON.stringify({ 
-            model: "openrouter/auto", 
+            model: "google/gemini-2.0-flash-exp:free", 
             messages: [{ role: "system", content: langInstruction + roleInstruction }, ...apiMessages] 
         })
     })
@@ -704,6 +705,8 @@ function sendMessage() {
         if (data.choices && data.choices.length > 0) {
             currentChat.messages.push({ role: "assistant", content: data.choices[0].message.content, isImage: false });
             renderCurrentChat();
+        } else if (data.error && data.error.message) {
+            document.getElementById(aiId).querySelector(".bubble").textContent = "Error API: " + data.error.message;
         } else {
             document.getElementById(aiId).querySelector(".bubble").textContent = t.error;
         }
