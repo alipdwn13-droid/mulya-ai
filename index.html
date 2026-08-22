@@ -588,10 +588,8 @@ function sendMessage() {
         renderHistoryList();
     }
 
-    // Push user message (mendukung teks dan gambar opsional)
     currentChat.messages.push({ role: "user", content: text || "Tolong analisis gambar ini.", imageUrl: activeImg });
     
-    // Reset input dan preview gambar
     input.value = "";
     input.style.height = 'auto';
     removeAttachedImage();
@@ -631,7 +629,6 @@ function sendMessage() {
     else if (aiRole === "audio_expert") roleInstruction = " Bertindaklah sebagai Ahli Sound System & Perangkat Audio Profesional.";
     else roleInstruction = " Bertindaklah sebagai Asisten AI pribadi yang cerdas dan serba bisa.";
 
-    // Siapkan payload messages untuk dikirim ke OpenRouter API (mendukung multimodal vision jika ada gambar)
     let apiMessages = [{ role: "system", content: langInstruction + roleInstruction }];
     
     currentChat.messages.forEach(m => {
@@ -657,7 +654,7 @@ function sendMessage() {
             "X-Title": "Mulya AI"
         },
         body: JSON.stringify({ 
-            model: "openrouter/auto", 
+            model: "google/gemini-2.5-flash", 
             messages: apiMessages 
         })
     })
