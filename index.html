@@ -24,6 +24,7 @@ textarea { flex: 1; background: transparent; border: none; outline: none; font-s
 .attach-btn { background: transparent; color: #747775; }
 .login-banner { padding: 20px; text-align: center; }
 .login-btn { background: #4285f4; color: white; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer; font-weight: 500; }
+.uploaded-img-preview { max-width: 200px; max-height: 200px; border-radius: 8px; margin-bottom: 8px; display: block; }
 </style>
 </head>
 <body>
@@ -46,6 +47,11 @@ textarea { flex: 1; background: transparent; border: none; outline: none; font-s
 
     <div class="input-area-wrapper" id="inputWrapper" style="display: none;">
         <div class="input-box">
+            <div id="imagePreviewContainer" style="display: none; padding: 6px; align-items: center; gap: 8px;">
+                <img id="imagePreviewThumbnail" src="" style="width: 40px; height: 40px; border-radius: 6px; object-fit: cover;">
+                <span id="imagePreviewName" style="font-size: 12px; flex: 1;"></span>
+                <button onclick="removeAttachedImage()" style="background:none; border:none; color:red; cursor:pointer;">✕</button>
+            </div>
             <div class="input-actions-row">
                 <input type="file" id="imageInput" accept="image/*" style="display: none;" onchange="handleImageUpload(event)">
                 <button class="attach-btn" onclick="document.getElementById('imageInput').click()">＋</button>
@@ -57,10 +63,12 @@ textarea { flex: 1; background: transparent; border: none; outline: none; font-s
 </div>
 
 <script>
-const apiKey = "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";
+// Ganti teks di dalam tanda kutip ini dengan API Key dari Google AI Studio kamu
+const apiKey = "AQ.Ab8RN6J58lSBnCmdZ-_fCrJ9gPvR3RLmrbFnvBrkRfKpmHl5uw";
 const googleClientId = "860718785165-1ir3kis2ggepql33ot5m5eo1j8s3k884.apps.googleusercontent.com";
 let tokenClient;
 let attachedImageBase64 = null;
+let attachedImageMimeType = null;
 
 window.onload = function () {
     if (typeof google !== 'undefined' && google.accounts) {
@@ -93,12 +101,22 @@ function handleGoogleLogin() {
 function handleImageUpload(e) {
     const file = e.target.files[0];
     if (!file) return;
+    attachedImageMimeType = file.type;
     const reader = new FileReader();
     reader.onload = (evt) => {
-        attachedImageBase64 = evt.target.result;
-        alert("Gambar berhasil dilampirkan!");
+        attachedImageBase64 = evt.target.result.split(',')[1];
+        document.getElementById("imagePreviewThumbnail").src = evt.target.result;
+        document.getElementById("imagePreviewName").textContent = file.name;
+        document.getElementById("imagePreviewContainer").style.display = "flex";
     };
     reader.readAsDataURL(file);
+}
+
+function removeAttachedImage() {
+    attachedImageBase64 = null;
+    attachedImageMimeType = null;
+    document.getElementById("imagePreviewContainer").style.display = "none";
+    document.getElementById("imageInput").value = "";
 }
 
 function sendMessage() {
@@ -107,35 +125,41 @@ function sendMessage() {
     if (!text && !attachedImageBase64) return;
 
     const historyDiv = document.getElementById("chat-history");
-    historyDiv.innerHTML += `<div class="message-row user"><div class="bubble">${text}</div></div>`;
-    input.value = "";
+    let imgHtml = attachedImageBase64 ? `<img src="data:${attachedImageMimeType};base64,${attachedImageBase64}" class="uploaded-img-preview">` : "";
+    historyDiv.innerHTML += `<div class="message-row user"><div class="bubble">${imgHtml}${text}</div></div>`;
     
+    input.value = "";
     let currentImg = attachedImageBase64;
-    attachedImageBase64 = null;
+    let currentMime = attachedImageMimeType;
+    removeAttachedImage();
 
     const aiId = "ai-" + Date.now();
     historyDiv.innerHTML += `<div class="message-row ai" id="${aiId}"><div class="bubble">Sedang berpikir...</div></div>`;
     historyDiv.scrollTop = historyDiv.scrollHeight;
 
-    let messages = [{ role: "user", content: currentImg ? [{ type: "text", text: text || "Analisis gambar ini" }, { type: "image_url", image_url: { url: currentImg } }] : text }];
+    let contentsArray = [];
+    if (currentImg) {
+        contentsArray.push({
+            inline_data: {
+                mime_type: currentMime,
+                data: currentImg
+            }
+        });
+    }
+    contentsArray.push({ text: text || "Tolong analisis gambar ini." });
 
-    fetch("https://openrouter.ai/api/v1/chat/completions", {
+    fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
         method: "POST",
-        headers: { 
-            "Authorization": "Bearer " + apiKey, 
-            "Content-Type": "application/json",
-            "HTTP-Referer": window.location.href,
-            "X-Title": "Mulya AI"
-        },
-        body: JSON.stringify({ 
-            model: "google/gemini-flash-1.5", 
-            messages: messages 
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            contents: [{ parts: contentsArray }]
         })
     })
     .then(res => res.json())
     .then(data => {
-        if (data.choices && data.choices.length > 0) {
-            document.getElementById(aiId).querySelector(".bubble").textContent = data.choices[0].message.content;
+        if (data.candidates && data.candidates[0].content) {
+            const reply = data.candidates[0].content.parts[0].text;
+            document.getElementById(aiId).querySelector(".bubble").textContent = reply;
         } else {
             document.getElementById(aiId).querySelector(".bubble").textContent = "Error: " + (data.error?.message || "Gagal merespons.");
         }
