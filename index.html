@@ -4,57 +4,98 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Mulya AI</title>
+<!-- Google Identity Services Library -->
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(100, 100, 100, 0.3); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(100, 100, 100, 0.5); }
+
 :root {
-    --bg-color: #ffffff; --text-color: #1f1f1f; --sidebar-bg: #f0f4f9;
-    --sidebar-border: #e3e3e3; --hover-bg: #e2e8f0; --active-bg: #d3e3fd;
-    --active-text: #001d35; --input-bg: #f0f4f9; --input-border: transparent;
-    --input-focus-bg: #fff; --user-bubble-bg: #f0f4f9; --user-bubble-text: #1f1f1f;
-    --footer-text: #747775; --modal-bg: #ffffff;
+    --bg-color: #ffffff;
+    --text-color: #1f1f1f;
+    --sidebar-bg: #f0f4f9;
+    --sidebar-border: #e3e3e3;
+    --hover-bg: #e2e8f0;
+    --active-bg: #d3e3fd;
+    --active-text: #001d35;
+    --input-bg: #f0f4f9;
+    --input-border: transparent;
+    --input-focus-bg: #fff;
+    --user-bubble-bg: #f0f4f9;
+    --user-bubble-text: #1f1f1f;
+    --footer-text: #747775;
+    --modal-bg: #ffffff;
 }
+
 body.dark-theme {
-    --bg-color: #131314; --text-color: #e3e3e3; --sidebar-bg: #1e1f20;
-    --sidebar-border: #333537; --hover-bg: #2d2f31; --active-bg: #004a77;
-    --active-text: #c2e7ff; --input-bg: #1e1f20; --input-border: #444746;
-    --input-focus-bg: #1e1f20; --user-bubble-bg: #282a2c; --user-bubble-text: #e3e3e3;
-    --footer-text: #9aa0a6; --modal-bg: #1e1f20;
+    --bg-color: #131314;
+    --text-color: #e3e3e3;
+    --sidebar-bg: #1e1f20;
+    --sidebar-border: #333537;
+    --hover-bg: #2d2f31;
+    --active-bg: #004a77;
+    --active-text: #c2e7ff;
+    --input-bg: #1e1f20;
+    --input-border: #444746;
+    --input-focus-bg: #1e1f20;
+    --user-bubble-bg: #282a2c;
+    --user-bubble-text: #e3e3e3;
+    --footer-text: #9aa0a6;
+    --modal-bg: #1e1f20;
 }
+
 body { display: flex; height: 100vh; height: 100dvh; background-color: var(--bg-color); color: var(--text-color); overflow: hidden; position: relative; }
+
 .mobile-header { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 60px; background: var(--bg-color); border-bottom: 1px solid var(--sidebar-border); z-index: 90; align-items: center; justify-content: space-between; padding: 0 16px; }
-.menu-toggle-btn { background: transparent; border: none; font-size: 22px; color: var(--text-color); cursor: pointer; width: 40px; height: 40px; border-radius: 50%; }
+.menu-toggle-btn { background: transparent; border: none; font-size: 22px; color: var(--text-color); cursor: pointer; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; }
+.menu-toggle-btn:hover { background: var(--hover-bg); }
 .mobile-title { font-weight: 600; font-size: 16px; background: linear-gradient(45deg, #4285f4, #9b72cb); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
 .login-header-btn { position: absolute; top: 16px; right: 20px; z-index: 100; }
-.login-btn-custom { background: #4285f4; color: white; border: none; padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+.login-btn-custom { background: #4285f4; color: white; border: none; padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 500; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: 0.2s; display: flex; align-items: center; gap: 6px; }
+.login-btn-custom:hover { opacity: 0.9; }
+
 .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 95; backdrop-filter: blur(2px); }
+
 .sidebar { width: 280px; background-color: var(--sidebar-bg); display: flex; flex-direction: column; justify-content: space-between; padding: 16px; border-right: 1px solid var(--sidebar-border); z-index: 99; flex-shrink: 0; }
 .sidebar-top { display: flex; flex-direction: column; gap: 16px; flex: 1; overflow: hidden; }
-.new-chat-btn { display: flex; align-items: center; gap: 10px; background: var(--active-bg); color: var(--active-text); border: none; padding: 12px 16px; border-radius: 24px; font-weight: 500; cursor: pointer; font-size: 14px; width: fit-content; }
-.brand { display: flex; align-items: center; gap: 10px; font-weight: 500; font-size: 18px; color: var(--text-color); padding-left: 4px; }
-.brand span { background: linear-gradient(45deg, #4285f4, #9b72cb); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: bold; }
+.new-chat-btn { display: flex; align-items: center; gap: 10px; background: var(--active-bg); color: var(--active-text); border: none; padding: 12px 16px; border-radius: 24px; font-weight: 500; cursor: pointer; font-size: 14px; width: fit-content; flex-shrink: 0; }
+.new-chat-btn:hover { opacity: 0.9; }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 500; font-size: 18px; color: var(--text-color); padding-left: 4px; flex-shrink: 0; }
+.brand span { background: linear-gradient(45deg, #4285f4, #9b72cb, #d96570); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: bold; }
+
 .history-list { overflow-y: auto; display: flex; flex-direction: column; gap: 4px; margin-top: 6px; padding-right: 4px; flex: 1; }
 .history-item { padding: 10px 14px; border-radius: 16px; font-size: 13px; color: var(--text-color); cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; background: transparent; border: none; text-align: left; width: 100%; }
 .history-item:hover { background: var(--hover-bg); }
 .history-item.active { background: var(--active-bg); color: var(--active-text); font-weight: 500; }
 .history-title-label { font-size: 11px; font-weight: bold; color: var(--footer-text); padding-left: 10px; margin-bottom: 4px; text-transform: uppercase; }
+
 .sidebar-bottom { display: flex; flex-direction: column; gap: 8px; border-top: 1px solid var(--sidebar-border); padding-top: 12px; }
-.creator-badge { font-size: 11px; color: var(--footer-text); padding-left: 10px; font-weight: 500; }
+.creator-badge { font-size: 11px; color: var(--footer-text); padding-left: 10px; margin-bottom: 2px; font-weight: 500; }
 .user-profile { display: flex; align-items: center; justify-content: space-between; font-size: 13px; color: var(--text-color); font-weight: 500; }
 .logout-btn { background: transparent; border: none; color: #d93025; font-size: 12px; cursor: pointer; }
-.settings-btn { display: flex; align-items: center; gap: 8px; background: transparent; border: none; color: var(--text-color); font-size: 13px; padding: 8px 10px; border-radius: 8px; cursor: pointer; width: 100%; font-weight: 500; }
+.logout-btn:hover { text-decoration: underline; }
+.settings-btn { display: flex; align-items: center; gap: 8px; background: transparent; border: none; color: var(--text-color); font-size: 13px; padding: 8px 10px; border-radius: 8px; cursor: pointer; width: 100%; text-align: left; font-weight: 500; }
 .settings-btn:hover { background: var(--hover-bg); }
+
 #settingsModal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 999; padding: 16px; }
-.settings-card { background: var(--modal-bg); color: var(--text-color); width: 100%; max-width: 400px; border-radius: 16px; padding: 24px; box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
+.settings-card { background: var(--modal-bg); color: var(--text-color); width: 100%; max-width: 400px; border-radius: 16px; padding: 24px; box-shadow: 0 8px 24px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto; }
+.settings-card h3 { font-size: 18px; margin-bottom: 20px; font-weight: 600; }
 .setting-group { margin-bottom: 16px; }
 .setting-group label { display: block; font-size: 13px; color: var(--footer-text); margin-bottom: 6px; }
-.setting-group select { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--sidebar-border); background: var(--bg-color); color: var(--text-color); font-size: 14px; }
+.setting-group select { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--sidebar-border); background: var(--bg-color); color: var(--text-color); font-size: 14px; outline: none; cursor: pointer; }
 .settings-footer { display: flex; justify-content: flex-end; margin-top: 24px; }
 .close-settings-btn { background: var(--active-bg); color: var(--active-text); border: none; padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 500; cursor: pointer; }
+
 .main-container { flex: 1; display: flex; flex-direction: column; justify-content: space-between; height: 100vh; height: 100dvh; position: relative; overflow: hidden; }
 #welcome-screen { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; }
-.welcome-title { font-size: 32px; font-weight: 500; background: linear-gradient(90deg, #4285f4, #9b72cb); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 10px; max-width: 600px; }
+.welcome-title { font-size: 32px; font-weight: 500; background: linear-gradient(90deg, #4285f4, #9b72cb); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 10px; line-height: 1.3; max-width: 600px; }
 .welcome-subtitle { font-size: 15px; color: var(--footer-text); margin-bottom: 20px; }
+
 #chat-history { flex: 1; overflow-y: auto; padding: 24px 15%; display: none; flex-direction: column; gap: 24px; scroll-behavior: smooth; }
 .message-row { display: flex; gap: 14px; align-items: flex-start; max-width: 100%; }
 .message-row.user { justify-content: flex-end; }
@@ -63,32 +104,35 @@ body { display: flex; height: 100vh; height: 100dvh; background-color: var(--bg-
 .avatar.user-av { background: var(--text-color); color: var(--bg-color); }
 .message-row.user .bubble { background: var(--user-bubble-bg); color: var(--user-bubble-text); padding: 10px 16px; border-radius: 16px; border-top-right-radius: 4px; max-width: 75%; word-break: break-word; white-space: pre-wrap; font-size: 15px; line-height: 1.6; }
 .message-row.ai .bubble { background: transparent; color: var(--text-color); padding: 0; width: 100%; word-break: break-word; white-space: pre-wrap; font-size: 15px; line-height: 1.6; }
-.chat-uploaded-img { max-width: 100%; max-height: 250px; border-radius: 8px; margin-bottom: 8px; display: block; object-fit: contain; }
+
+.ai-generated-image { max-width: 100%; max-height: 400px; border-radius: 12px; margin-top: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: block; object-fit: contain; }
+.download-img-btn { display: inline-block; margin-top: 8px; padding: 6px 14px; background: #4285f4; color: white; border-radius: 20px; font-size: 12px; text-decoration: none; font-weight: 500; }
+.download-img-btn:hover { opacity: 0.9; }
+
 .input-area-wrapper { padding: 15px 15% 25px 15%; background: linear-gradient(180deg, rgba(0,0,0,0) 0%, var(--bg-color) 80%); }
-#imagePreviewContainer { display: none; align-items: center; gap: 10px; background: var(--sidebar-bg); padding: 8px 12px; border-radius: 12px; margin-bottom: 8px; width: fit-content; border: 1px solid var(--sidebar-border); }
-#imagePreviewContainer img { width: 40px; height: 40px; object-fit: cover; border-radius: 6px; }
-#imagePreviewContainer span { font-size: 13px; font-weight: 500; color: var(--text-color); }
-.remove-preview-btn { background: transparent; border: none; color: #d93025; font-size: 16px; cursor: pointer; padding: 0 4px; }
-.input-box { display: flex; align-items: center; background: var(--input-bg); border-radius: 30px; padding: 8px 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); border: 1px solid var(--input-border); position: relative; }
-.input-box:focus-within { border-color: #4285f4; background: var(--input-focus-bg); }
-.attach-menu-wrapper { position: relative; }
-.attach-btn { background: transparent; border: none; font-size: 20px; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-color); }
-.attach-dropdown { display: none; position: absolute; bottom: 45px; left: 0; background: var(--modal-bg); border: 1px solid var(--sidebar-border); border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.15); width: 180px; z-index: 100; overflow: hidden; }
-.attach-dropdown.show { display: block; }
-.attach-option { display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px 14px; background: transparent; border: none; color: var(--text-color); font-size: 13px; font-weight: 500; cursor: pointer; text-align: left; }
-.attach-option:hover { background: var(--hover-bg); }
-textarea { flex: 1; background: transparent; border: none; outline: none; font-size: 15px; resize: none; max-height: 120px; color: var(--text-color); padding: 4px 8px; }
-.send-btn { background: var(--text-color); color: var(--bg-color); border: none; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+.input-box { display: flex; align-items: center; background: var(--input-bg); border-radius: 30px; padding: 8px 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); border: 1px solid var(--input-border); }
+.input-box:focus-within { border-color: #4285f4; background: var(--input-focus-bg); box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+textarea { flex: 1; background: transparent; border: none; outline: none; font-size: 15px; resize: none; max-height: 120px; color: var(--text-color); padding: 4px 6px; }
+.send-btn { background: var(--text-color); color: var(--bg-color); border: none; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; flex-shrink: 0; }
+.send-btn:hover { opacity: 0.8; }
 .footer-note { font-size: 11px; color: var(--footer-text); text-align: center; margin-top: 8px; }
+
+@media (max-width: 1024px) {
+    #chat-history { padding: 24px 8%; }
+    .input-area-wrapper { padding: 15px 8% 20px 8%; }
+}
+
 @media (max-width: 768px) {
     .mobile-header { display: flex; }
     .login-header-btn { top: 12px; right: 16px; }
-    .sidebar { position: fixed; top: 0; left: 0; height: 100%; transform: translateX(-100%); transition: transform 0.3s ease; }
+    .sidebar { position: fixed; top: 0; left: 0; height: 100%; transform: translateX(-100%); box-shadow: 4px 0 16px rgba(0,0,0,0.15); transition: transform 0.3s ease; }
     .sidebar.mobile-open { transform: translateX(0); }
     .sidebar-overlay.active { display: block; }
     .main-container { padding-top: 60px; }
-    #chat-history { padding: 16px 4%; }
+    #chat-history { padding: 16px 4%; gap: 16px; }
     .input-area-wrapper { padding: 10px 4% 16px 4%; }
+    .welcome-title { font-size: 24px; padding: 0 10px; }
+    .message-row.user .bubble { max-width: 85%; }
 }
 </style>
 </head>
@@ -103,31 +147,48 @@ textarea { flex: 1; background: transparent; border: none; outline: none; font-s
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
 <div id="loginBtnContainer" class="login-header-btn">
-    <button class="login-btn-custom" onclick="handleGoogleLogin()">Login Google</button>
+    <button class="login-btn-custom" onclick="handleGoogleLogin()">
+        <svg width="16" height="16" viewBox="0 0 24 24"><path fill="#ffffff" d="M12 5c1.6 0 3 .6 4.1 1.6l3.1-3.1C17.3 1.8 14.8 1 12 1 7.4 1 3.5 3.6 1.6 7.4l3.7 2.9C6.2 7.1 8.9 5 12 5z"/><path fill="#ffffff" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.6h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.9z"/><path fill="#ffffff" d="M5.3 14.7c-.2-.8-.4-1.7-.4-2.7s.2-1.9.4-2.7L1.6 6.4C.6 8.4 0 10.6 0 13s.6 4.6 1.6 6.6l3.7-2.9z"/><path fill="#ffffff" d="M12 23c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3.1 0-5.8-2.1-6.7-5.3L1.6 15.9C3.5 19.7 7.4 23 12 23z"/></svg>
+        Login Google
+    </button>
 </div>
-
-<input type="file" id="galleryInput" accept="image/*" style="display:none;" onchange="handleImageSelected(event)">
-<input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none;" onchange="handleImageSelected(event)">
 
 <div id="settingsModal">
     <div class="settings-card">
-        <h3>Pengaturan</h3>
+        <h3 id="setModalTitle">Pengaturan</h3>
         <div class="setting-group">
-            <label>Tema</label>
+            <label id="setThemeLabel">Tema</label>
             <select id="themeSelect" onchange="changeTheme()">
-                <option value="light">Terang</option>
-                <option value="dark">Gelap</option>
+                <option value="light">Terang (Light)</option>
+                <option value="dark">Gelap (Dark)</option>
             </select>
         </div>
         <div class="setting-group">
-            <label>Peran AI</label>
+            <label id="setLangLabel">Bahasa Tampilan Aplikasi</label>
+            <select id="langSelect" onchange="changeLanguage()">
+                <option value="id">Indonesia</option>
+                <option value="en">English</option>
+            </select>
+        </div>
+        <div class="setting-group">
+            <label id="setChatLangLabel">Bahasa Respon Chat AI</label>
+            <select id="chatLangSelect" onchange="changeChatLanguage()">
+                <option value="id">Bahasa Indonesia</option>
+                <option value="en">English</option>
+            </select>
+        </div>
+        <div class="setting-group">
+            <label id="setAiRoleLabel">Peran / Mode Asisten AI</label>
             <select id="aiRoleSelect" onchange="changeAiRole()">
-                <option value="general">Asisten Serba Bisa</option>
-                <option value="teacher">Guru / Mentor Sekolah</option>
+                <option value="general">Asisten Serba Bisa (General Assistant)</option>
+                <option value="coder">Ahli Pemrograman / Coder (HTML, JS, Audio API, dll)</option>
+                <option value="writer">Penulis Kreatif & Konten (Cerita, Pidato, Artikel)</option>
+                <option value="teacher">Guru / Mentor Edukasi (Penjelas Materi Sekolah)</option>
+                <option value="audio_expert">Ahli Sound System & Audio Profesional</option>
             </select>
         </div>
         <div class="settings-footer">
-            <button class="close-settings-btn" onclick="closeSettings()">Tutup</button>
+            <button class="close-settings-btn" onclick="closeSettings()" id="setCloseBtn">Tutup</button>
         </div>
     </div>
 </div>
@@ -135,47 +196,38 @@ textarea { flex: 1; background: transparent; border: none; outline: none; font-s
 <div class="sidebar" id="appSidebar">
     <div class="sidebar-top">
         <div class="brand">✨ <span>Mulya AI</span></div>
-        <button class="new-chat-btn" onclick="startNewChat()">＋ Percakapan baru</button>
-        <div class="history-title-label">Riwayat</div>
-        <div class="history-list" id="chatHistoryList"></div>
+        <button class="new-chat-btn" onclick="startNewChat()" id="newChatBtn">＋ Percakapan baru</button>
+        
+        <div style="margin-top: 10px; display: flex; flex-direction: column; flex: 1; overflow: hidden;">
+            <div class="history-title-label" id="historyLabel">Riwayat</div>
+            <div class="history-list" id="chatHistoryList"></div>
+        </div>
     </div>
+    
     <div class="sidebar-bottom">
         <div class="creator-badge">By: Alip Dwi Nugroho</div>
-        <button class="settings-btn" onclick="openSettings()">⚙️ Pengaturan</button>
+        <button class="settings-btn" onclick="openSettings()">⚙️ <span id="settingsMenuText">Pengaturan</span></button>
         <div class="user-profile" id="userProfileSection" style="display: none;">
             <span id="displayUserName">Akun</span>
-            <button class="logout-btn" onclick="handleLogout()">Keluar</button>
+            <button class="logout-btn" onclick="handleLogout()" id="logoutBtnText">Keluar</button>
         </div>
     </div>
 </div>
 
 <div class="main-container">
     <div id="welcome-screen">
-        <div class="welcome-title">Perkenalkan Mulya AI</div>
-        <div class="welcome-subtitle">Silakan Login Google terlebih dahulu di pojok kanan atas.</div>
+        <div class="welcome-title" id="welcomeGreeting">Perkenalkan Mulya AI, asisten AI pribadi Anda</div>
+        <div class="welcome-subtitle" id="welcomeSub">Silakan Login Google terlebih dahulu di pojok kanan atas untuk mulai menggunakan AI.</div>
     </div>
 
     <div id="chat-history"></div>
 
     <div class="input-area-wrapper">
-        <div id="imagePreviewContainer">
-            <img id="previewImgElement" src="" alt="Preview">
-            <span id="previewImgName">Foto</span>
-            <button class="remove-preview-btn" onclick="removeAttachedImage()">✕</button>
-        </div>
-
         <div class="input-box" id="inputBoxContainer" style="opacity: 0.5; pointer-events: none;">
-            <div class="attach-menu-wrapper">
-                <button class="attach-btn" onclick="toggleAttachMenu(event)">＋</button>
-                <div class="attach-dropdown" id="attachDropdownMenu">
-                    <button class="attach-option" onclick="triggerGallery()">📁 Upload Gambar</button>
-                    <button class="attach-option" onclick="triggerCamera()">📸 Buka Kamera</button>
-                </div>
-            </div>
-            <textarea id="userInput" placeholder="Silakan Login Google terlebih dahulu..." rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)" disabled></textarea>
+            <textarea id="userInput" placeholder="Silakan Login Google terlebih dahulu..." rows="1" disabled onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
             <button class="send-btn" id="sendBtn" disabled onclick="sendMessage()">➤</button>
         </div>
-        <div class="footer-note">Mulya AI dapat menampilkan info yang tidak akurat.</div>
+        <div class="footer-note" id="footerNoteText">Mulya AI dapat menampilkan info yang tidak akurat. Verifikasi respons penting.</div>
     </div>
 </div>
 
@@ -186,8 +238,55 @@ const googleClientId = "860718785165-1ir3kis2ggepql33ot5m5eo1j8s3k884.apps.googl
 let allChats = [];
 let currentChatId = null;
 let currentUserName = "";
+let currentLang = "id";
+let chatLang = "id";
+let aiRole = "general";
 let tokenClient;
-let attachedImageBase64 = null;
+
+const translations = {
+    id: {
+        newChat: "＋ Percakapan baru",
+        history: "Riwayat",
+        settings: "Pengaturan",
+        logout: "Keluar",
+        welcome: "Perkenalkan Mulya AI, asisten AI pribadi Anda",
+        welcomeSubLogin: "Silakan Login Google terlebih dahulu di pojok kanan atas untuk mulai menggunakan AI.",
+        placeholderLogin: "Silakan Login Google terlebih dahulu...",
+        placeholderReady: "Minta Mulya AI atau buat gambar (cth: buat gambar...)...",
+        footer: "Mulya AI dapat menampilkan info yang tidak akurat. Verifikasi respons penting.",
+        thinking: "Berpikir & Memproses Gambar...",
+        error: "Maaf, terjadi kesalahan.",
+        connectionError: "Gagal terhubung.",
+        modalTitle: "Pengaturan",
+        themeLabel: "Tema",
+        langLabel: "Bahasa Tampilan Aplikasi",
+        chatLangLabel: "Bahasa Respon Chat AI",
+        aiRoleLabel: "Peran / Mode Asisten AI",
+        closeBtn: "Tutup",
+        newChatTitle: "Percakapan Baru"
+    },
+    en: {
+        newChat: "＋ New chat",
+        history: "History",
+        settings: "Settings",
+        logout: "Log out",
+        welcome: "Meet Mulya AI, your personal assistant",
+        welcomeSubLogin: "Please log in with Google at the top right to start using AI.",
+        placeholderLogin: "Please log in with Google first...",
+        placeholderReady: "Ask Mulya AI or generate image (e.g., generate image...)....",
+        footer: "Mulya AI may display inaccurate info. Verify important responses.",
+        thinking: "Thinking & Generating Image...",
+        error: "Sorry, an error occurred.",
+        connectionError: "Connection failed.",
+        modalTitle: "Settings",
+        themeLabel: "Theme",
+        langLabel: "App Interface Language",
+        chatLangLabel: "AI Chat Response Language",
+        aiRoleLabel: "AI Assistant Role / Mode",
+        closeBtn: "Close",
+        newChatTitle: "New Chat"
+    }
+};
 
 window.onload = function () {
     if (typeof google !== 'undefined' && google.accounts) {
@@ -214,8 +313,11 @@ window.onload = function () {
 };
 
 function handleGoogleLogin() {
-    if (tokenClient) tokenClient.requestAccessToken();
-    else alert("Google Identity belum siap, coba refresh halaman.");
+    if (tokenClient) {
+        tokenClient.requestAccessToken();
+    } else {
+        alert("Google Identity belum siap. Coba refresh halaman beberapa saat lagi.");
+    }
 }
 
 function setLoggedInState() {
@@ -223,74 +325,106 @@ function setLoggedInState() {
     document.getElementById("userProfileSection").style.display = "flex";
     document.getElementById("displayUserName").textContent = currentUserName;
     
+    // Buka kunci input chat
     const inputBox = document.getElementById("inputBoxContainer");
     inputBox.style.opacity = "1";
     inputBox.style.pointerEvents = "auto";
     document.getElementById("userInput").disabled = false;
     document.getElementById("sendBtn").disabled = false;
-    document.getElementById("userInput").placeholder = "Kirim pesan atau tanya foto...";
 
-    document.getElementById("welcome-screen").querySelector(".welcome-title").textContent = `Halo, ${currentUserName}!`;
-    document.getElementById("welcome-screen").querySelector(".welcome-subtitle").textContent = "Ada yang bisa dibantu hari ini?";
-
+    updateTexts();
     if (allChats.length === 0) startNewChat();
 }
 
-function toggleAttachMenu(e) {
-    e.stopPropagation();
-    document.getElementById("attachDropdownMenu").classList.toggle("show");
-}
-
-window.onclick = function() {
-    const menu = document.getElementById("attachDropdownMenu");
-    if (menu) menu.classList.remove("show");
-}
-
-function triggerGallery() { document.getElementById("galleryInput").click(); }
-function triggerCamera() { document.getElementById("cameraInput").click(); }
-
-function handleImageSelected(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        attachedImageBase64 = e.target.result;
-        document.getElementById("previewImgElement").src = attachedImageBase64;
-        document.getElementById("imagePreviewContainer").style.display = "flex";
-    };
-    reader.readAsDataURL(file);
-    event.target.value = "";
-}
-
-function removeAttachedImage() {
-    attachedImageBase64 = null;
-    document.getElementById("imagePreviewContainer").style.display = "none";
-}
-
 function toggleSidebar() {
-    document.getElementById("appSidebar").classList.toggle("mobile-open");
-    document.getElementById("sidebarOverlay").classList.toggle("active");
+    const sidebar = document.getElementById("appSidebar");
+    const overlay = document.getElementById("sidebarOverlay");
+    sidebar.classList.toggle("mobile-open");
+    overlay.classList.toggle("active");
 }
 
-function autoResize(ta) {
-    ta.style.height = 'auto';
-    ta.style.height = Math.min(ta.scrollHeight, 120) + 'px';
+function autoResize(textarea) {
+    textarea.style.height = 'auto';
+    textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
 }
 
-function openSettings() { document.getElementById("settingsModal").style.display = "flex"; }
-function closeSettings() { document.getElementById("settingsModal").style.display = "none"; }
+function updateTexts() {
+    const t = translations[currentLang];
+    document.getElementById("newChatBtn").textContent = t.newChat;
+    document.getElementById("historyLabel").textContent = t.history;
+    document.getElementById("settingsMenuText").textContent = t.settings;
+    document.getElementById("logoutBtnText").textContent = t.logout;
+    document.getElementById("footerNoteText").textContent = t.footer;
+    document.getElementById("setModalTitle").textContent = t.modalTitle;
+    document.getElementById("setThemeLabel").textContent = t.themeLabel;
+    document.getElementById("setLangLabel").textContent = t.langLabel;
+    document.getElementById("setChatLangLabel").textContent = t.chatLangLabel;
+    document.getElementById("setAiRoleLabel").textContent = t.aiRoleLabel;
+    document.getElementById("setCloseBtn").textContent = t.closeBtn;
+    
+    if (!currentUserName) {
+        document.getElementById("welcomeGreeting").textContent = t.welcome;
+        document.getElementById("welcomeSub").textContent = t.welcomeSubLogin;
+        document.getElementById("userInput").placeholder = t.placeholderLogin;
+    } else {
+        document.getElementById("welcomeGreeting").textContent = currentLang === 'id' ? `Halo, ${currentUserName}! Ada yang bisa dibantu hari ini?` : `Hello, ${currentUserName}! How can I help you today?`;
+        document.getElementById("welcomeSub").textContent = "";
+        document.getElementById("userInput").placeholder = t.placeholderReady;
+    }
+}
+
+function openSettings() {
+    document.getElementById("settingsModal").style.display = "flex";
+}
+
+function closeSettings() {
+    document.getElementById("settingsModal").style.display = "none";
+}
+
 function changeTheme() {
     const theme = document.getElementById("themeSelect").value;
     localStorage.setItem("mulya_theme", theme);
-    if (theme === "dark") document.body.classList.add("dark-theme");
-    else document.body.classList.remove("dark-theme");
+    if (theme === "dark") {
+        document.body.classList.add("dark-theme");
+    } else {
+        document.body.classList.remove("dark-theme");
+    }
 }
-function changeAiRole() { localStorage.setItem("mulya_ai_role", document.getElementById("aiRoleSelect").value); }
+
+function changeLanguage() {
+    currentLang = document.getElementById("langSelect").value;
+    localStorage.setItem("mulya_lang", currentLang);
+    updateTexts();
+}
+
+function changeChatLanguage() {
+    chatLang = document.getElementById("chatLangSelect").value;
+    localStorage.setItem("mulya_chat_lang", chatLang);
+}
+
+function changeAiRole() {
+    aiRole = document.getElementById("aiRoleSelect").value;
+    localStorage.setItem("mulya_ai_role", aiRole);
+}
 
 window.addEventListener("DOMContentLoaded", () => {
     const savedTheme = localStorage.getItem("mulya_theme") || "light";
     document.getElementById("themeSelect").value = savedTheme;
     if (savedTheme === "dark") document.body.classList.add("dark-theme");
+
+    const savedLang = localStorage.getItem("mulya_lang") || "id";
+    document.getElementById("langSelect").value = savedLang;
+    currentLang = savedLang;
+
+    const savedChatLang = localStorage.getItem("mulya_chat_lang") || "id";
+    document.getElementById("chatLangSelect").value = savedChatLang;
+    chatLang = savedChatLang;
+
+    const savedAiRole = localStorage.getItem("mulya_ai_role") || "general";
+    document.getElementById("aiRoleSelect").value = savedAiRole;
+    aiRole = savedAiRole;
+
+    updateTexts();
 
     const savedUser = localStorage.getItem("mulya_username");
     if (savedUser) {
@@ -300,17 +434,33 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 
 function handleLogout() {
+    currentUserName = "";
     localStorage.removeItem("mulya_username");
+    document.getElementById("loginBtnContainer").style.display = "block";
+    document.getElementById("userProfileSection").style.display = "none";
+    
+    // Kunci kembali input chat
+    const inputBox = document.getElementById("inputBoxContainer");
+    inputBox.style.opacity = "0.5";
+    inputBox.style.pointerEvents = "none";
+    document.getElementById("userInput").disabled = true;
+    document.getElementById("sendBtn").disabled = true;
+
+    updateTexts();
     location.reload();
 }
 
 function startNewChat() {
     if (!currentUserName) return;
     currentChatId = Date.now();
-    allChats.push({ id: currentChatId, title: "Percakapan Baru", messages: [] });
+    const t = translations[currentLang];
+    allChats.push({ id: currentChatId, title: t.newChatTitle, messages: [] });
     renderHistoryList();
     renderCurrentChat();
-    if (window.innerWidth <= 768) toggleSidebar();
+    if (window.innerWidth <= 768) {
+        document.getElementById("appSidebar").classList.remove("mobile-open");
+        document.getElementById("sidebarOverlay").classList.remove("active");
+    }
 }
 
 function renderHistoryList() {
@@ -320,9 +470,21 @@ function renderHistoryList() {
         const btn = document.createElement("button");
         btn.className = "history-item" + (chat.id === currentChatId ? " active" : "");
         btn.textContent = chat.title;
-        btn.onclick = () => { currentChatId = chat.id; renderHistoryList(); renderCurrentChat(); if(window.innerWidth<=768) toggleSidebar(); };
+        btn.onclick = () => {
+            switchChat(chat.id);
+            if (window.innerWidth <= 768) {
+                document.getElementById("appSidebar").classList.remove("mobile-open");
+                document.getElementById("sidebarOverlay").classList.remove("active");
+            }
+        };
         listEl.appendChild(btn);
     });
+}
+
+function switchChat(id) {
+    currentChatId = id;
+    renderHistoryList();
+    renderCurrentChat();
 }
 
 function renderCurrentChat() {
@@ -342,10 +504,28 @@ function renderCurrentChat() {
 
     currentChat.messages.forEach(msg => {
         if (msg.role === "user") {
-            let imgTag = msg.userImage ? `<img src="${msg.userImage}" class="chat-uploaded-img">` : "";
-            historyDiv.innerHTML += `<div class="message-row user"><div class="bubble">${imgTag}<div>${escapeHtml(msg.content)}</div></div><div class="avatar user-av">U</div></div>`;
+            historyDiv.innerHTML += `
+                <div class="message-row user">
+                    <div class="bubble">${escapeHtml(msg.content)}</div>
+                    <div class="avatar user-av">${currentUserName ? currentUserName.charAt(0).toUpperCase() : 'U'}</div>
+                </div>`;
         } else {
-            historyDiv.innerHTML += `<div class="message-row ai"><div class="avatar ai-av">✨</div><div class="bubble">${escapeHtml(msg.content)}</div></div>`;
+            let contentHtml = msg.content;
+            if (msg.isImage) {
+                contentHtml = `
+                    <div>${escapeHtml(msg.textResponse)}</div>
+                    <img src="${msg.imageUrl}" class="ai-generated-image" alt="Generated Image" />
+                    <a href="${msg.imageUrl}" target="_blank" download="mulya-ai-image.jpg" class="download-img-btn">⬇ Download Gambar</a>
+                `;
+            } else {
+                contentHtml = escapeHtml(msg.content);
+            }
+
+            historyDiv.innerHTML += `
+                <div class="message-row ai">
+                    <div class="avatar ai-av">✨</div>
+                    <div class="bubble">${contentHtml}</div>
+                </div>`;
         }
     });
     historyDiv.scrollTop = historyDiv.scrollHeight;
@@ -355,45 +535,55 @@ function sendMessage() {
     if (!currentUserName) return;
     const input = document.getElementById("userInput");
     const text = input.value.trim();
-    const hasImage = attachedImageBase64 !== null;
+    if (!text) return;
 
-    if (!text && !hasImage) return;
     if (!currentChatId || allChats.length === 0) startNewChat();
 
     const currentChat = allChats.find(c => c.id === currentChatId);
     if (currentChat.messages.length === 0) {
-        currentChat.title = text ? (text.length > 20 ? text.substring(0, 20) + "..." : text) : "Foto Soal";
+        currentChat.title = text.length > 20 ? text.substring(0, 20) + "..." : text;
         renderHistoryList();
     }
 
-    const messagePayload = { role: "user", content: text || "Tolong jawab soal di foto ini.", userImage: attachedImageBase64 };
-    currentChat.messages.push(messagePayload);
-    
+    currentChat.messages.push({ role: "user", content: text });
     input.value = "";
     input.style.height = 'auto';
-    removeAttachedImage();
     renderCurrentChat();
 
     const historyDiv = document.getElementById("chat-history");
     const aiId = "ai-resp-" + Date.now();
-    historyDiv.innerHTML += `<div class="message-row ai" id="${aiId}"><div class="avatar ai-av">✨</div><div class="bubble">Sedang menganalisis foto & berpikir...</div></div>`;
+    const t = translations[currentLang];
+    historyDiv.innerHTML += `
+        <div class="message-row ai" id="${aiId}">
+            <div class="avatar ai-av">✨</div>
+            <div class="bubble">${t.thinking}</div>
+        </div>`;
     historyDiv.scrollTop = historyDiv.scrollHeight;
 
-    let apiMessages = currentChat.messages.map(m => {
-        if (m.userImage) {
-            return {
-                role: m.role,
-                content: [
-                    { type: "text", text: m.content },
-                    { type: "image_url", image_url: { url: m.userImage } }
-                ]
-            };
-        } else {
-            return { role: m.role, content: m.content };
-        }
-    });
+    const lowerText = text.toLowerCase();
+    const isImageRequest = lowerText.includes("buat gambar") || lowerText.includes("bikin gambar") || lowerText.includes("generate image") || lowerText.includes("lukiskan");
 
-    // Model diganti ke google/gemini-flash-1.5 atau openrouter/free-router yang stabil untuk gambar
+    if (isImageRequest) {
+        let imagePrompt = text.replace(/buat gambar|bikin gambar|generate image|lukiskan/gi, "").trim();
+        if (!imagePrompt) imagePrompt = text;
+        let imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(imagePrompt)}?width=1024&height=1024&nologo=true`;
+        
+        setTimeout(() => {
+            let textResponse = chatLang === "en" ? `Here is the image you requested based on: "${imagePrompt}"` : `Berikut adalah hasil gambar yang kamu minta berdasarkan: "${imagePrompt}"`;
+            currentChat.messages.push({ role: "assistant", content: textResponse, isImage: true, textResponse, imageUrl });
+            renderCurrentChat();
+        }, 1000);
+        return;
+    }
+
+    let langInstruction = chatLang === "en" ? "You must always reply in English." : "Kamu harus selalu merespons menggunakan Bahasa Indonesia.";
+    let roleInstruction = "";
+    if (aiRole === "coder") roleInstruction = " Bertindaklah sebagai Ahli Pemrograman/Developer profesional.";
+    else if (aiRole === "writer") roleInstruction = " Bertindaklah sebagai Penulis Kreatif profesional.";
+    else if (aiRole === "teacher") roleInstruction = " Bertindaklah sebagai Guru atau Mentor yang sabar dan pintar.";
+    else if (aiRole === "audio_expert") roleInstruction = " Bertindaklah sebagai Ahli Sound System & Perangkat Audio Profesional.";
+    else roleInstruction = " Bertindaklah sebagai Asisten AI pribadi yang cerdas dan serba bisa.";
+
     fetch("https://openrouter.ai/api/v1/chat/completions", {
         method: "POST",
         headers: { 
@@ -403,28 +593,31 @@ function sendMessage() {
             "X-Title": "Mulya AI"
         },
         body: JSON.stringify({ 
-            model: "google/gemini-flash-1.5", 
-            messages: [{ role: "system", content: "Kamu adalah asisten AI pendidikan yang membantu menjawab soal-soal sekolah dengan bahasa Indonesia." }, ...apiMessages] 
+            model: "openrouter/auto", 
+            messages: [{ role: "system", content: langInstruction + roleInstruction }, ...currentChat.messages.map(m => ({ role: m.role, content: m.content }))] 
         })
     })
     .then(res => res.json())
     .then(data => {
         if (data.choices && data.choices.length > 0) {
-            currentChat.messages.push({ role: "assistant", content: data.choices[0].message.content });
+            currentChat.messages.push({ role: "assistant", content: data.choices[0].message.content, isImage: false });
             renderCurrentChat();
-        } else if (data.error) {
-            document.getElementById(aiId).querySelector(".bubble").textContent = "Error API: " + data.error.message;
         } else {
-            document.getElementById(aiId).querySelector(".bubble").textContent = "Terjadi kesalahan respons.";
+            document.getElementById(aiId).querySelector(".bubble").textContent = t.error;
         }
     })
     .catch(() => {
-        document.getElementById(aiId).querySelector(".bubble").textContent = "Gagal terhubung ke server.";
+        document.getElementById(aiId).querySelector(".bubble").textContent = t.connectionError;
     });
 }
 
-function handleKey(e) { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } }
-function escapeHtml(t) { return t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+function handleKey(e) {
+    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+}
+
+function escapeHtml(text) {
+    return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
 </script>
 </body>
 </html>
