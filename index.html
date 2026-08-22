@@ -287,7 +287,7 @@ const translations = {
         welcome: "Perkenalkan Mulya AI, asisten AI pribadi Anda",
         welcomeSubLogin: "Silakan Login Google terlebih dahulu di pojok kanan atas untuk mulai menggunakan AI.",
         placeholderLogin: "Silakan Login Google terlebih dahulu...",
-        placeholderReady: "Kirim pesan atau tanya foto yang diambil dari kamera...",
+        placeholderReady: "Kirim pesan atau tanya foto dari kamera...",
         footer: "Mulya AI dapat menampilkan info yang tidak akurat. Verifikasi respons penting.",
         thinking: "Sedang menganalisis gambar & berpikir...",
         error: "Maaf, terjadi kesalahan.",
@@ -623,7 +623,7 @@ function sendMessage() {
         renderHistoryList();
     }
 
-    const defaultPrompt = chatLang === "en" ? "Please describe and answer what is in this photo." : "Tolong jelaskan dan jawab apa yang ada di foto/kamera ini.";
+    const defaultPrompt = chatLang === "en" ? "Please solve or explain what is in this photo." : "Tolong jelaskan dan jawab isi foto/soal ini secara lengkap.";
     const messagePayload = { 
         role: "user", 
         content: text || defaultPrompt, 
@@ -686,7 +686,7 @@ function sendMessage() {
         }
     });
 
-    // Menggunakan model Google Gemini 2.0 Flash yang mendukung Vision (Analisis Gambar & Kamera) secara stabil di OpenRouter
+    // Menggunakan openrouter/auto agar otomatis memilih model vision/multimodal terbaik yang sedang aktif & gratis
     fetch("https://openrouter.ai/api/v1/chat/completions", {
         method: "POST",
         headers: { 
@@ -696,7 +696,7 @@ function sendMessage() {
             "X-Title": "Mulya AI"
         },
         body: JSON.stringify({ 
-            model: "google/gemini-2.0-flash-exp:free", 
+            model: "openrouter/auto", 
             messages: [{ role: "system", content: langInstruction + roleInstruction }, ...apiMessages] 
         })
     })
