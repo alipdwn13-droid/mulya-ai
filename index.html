@@ -93,7 +93,8 @@ body { display: flex; height: 100vh; height: 100dvh; background-color: var(--bg-
 
 .main-container { flex: 1; display: flex; flex-direction: column; justify-content: space-between; height: 100vh; height: 100dvh; position: relative; overflow: hidden; }
 #welcome-screen { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; }
-.welcome-title { font-size: 32px; font-weight: 500; background: linear-gradient(90deg, #4285f4, #9b72cb); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 30px; line-height: 1.3; max-width: 600px; }
+.welcome-title { font-size: 32px; font-weight: 500; background: linear-gradient(90deg, #4285f4, #9b72cb); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 10px; line-height: 1.3; max-width: 600px; }
+.welcome-subtitle { font-size: 15px; color: var(--footer-text); margin-bottom: 20px; }
 
 #chat-history { flex: 1; overflow-y: auto; padding: 24px 15%; display: none; flex-direction: column; gap: 24px; scroll-behavior: smooth; }
 .message-row { display: flex; gap: 14px; align-items: flex-start; max-width: 100%; }
@@ -216,14 +217,15 @@ textarea { flex: 1; background: transparent; border: none; outline: none; font-s
 <div class="main-container">
     <div id="welcome-screen">
         <div class="welcome-title" id="welcomeGreeting">Perkenalkan Mulya AI, asisten AI pribadi Anda</div>
+        <div class="welcome-subtitle" id="welcomeSub">Silakan Login Google terlebih dahulu di pojok kanan atas untuk mulai menggunakan AI.</div>
     </div>
 
     <div id="chat-history"></div>
 
     <div class="input-area-wrapper">
-        <div class="input-box">
-            <textarea id="userInput" placeholder="Minta Mulya AI atau buat gambar..." rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
-            <button class="send-btn" onclick="sendMessage()">➤</button>
+        <div class="input-box" id="inputBoxContainer" style="opacity: 0.5; pointer-events: none;">
+            <textarea id="userInput" placeholder="Silakan Login Google terlebih dahulu..." rows="1" disabled onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+            <button class="send-btn" id="sendBtn" disabled onclick="sendMessage()">➤</button>
         </div>
         <div class="footer-note" id="footerNoteText">Mulya AI dapat menampilkan info yang tidak akurat. Verifikasi respons penting.</div>
     </div>
@@ -248,7 +250,9 @@ const translations = {
         settings: "Pengaturan",
         logout: "Keluar",
         welcome: "Perkenalkan Mulya AI, asisten AI pribadi Anda",
-        placeholder: "Minta Mulya AI atau buat gambar (cth: buat gambar...)...",
+        welcomeSubLogin: "Silakan Login Google terlebih dahulu di pojok kanan atas untuk mulai menggunakan AI.",
+        placeholderLogin: "Silakan Login Google terlebih dahulu...",
+        placeholderReady: "Minta Mulya AI atau buat gambar (cth: buat gambar...)...",
         footer: "Mulya AI dapat menampilkan info yang tidak akurat. Verifikasi respons penting.",
         thinking: "Berpikir & Memproses Gambar...",
         error: "Maaf, terjadi kesalahan.",
@@ -267,7 +271,9 @@ const translations = {
         settings: "Settings",
         logout: "Log out",
         welcome: "Meet Mulya AI, your personal assistant",
-        placeholder: "Ask Mulya AI or generate image (e.g., generate image...)....",
+        welcomeSubLogin: "Please log in with Google at the top right to start using AI.",
+        placeholderLogin: "Please log in with Google first...",
+        placeholderReady: "Ask Mulya AI or generate image (e.g., generate image...)....",
         footer: "Mulya AI may display inaccurate info. Verify important responses.",
         thinking: "Thinking & Generating Image...",
         error: "Sorry, an error occurred.",
@@ -297,11 +303,7 @@ window.onload = function () {
                         if (data && data.name) {
                             currentUserName = data.name;
                             localStorage.setItem("mulya_username", currentUserName);
-                            document.getElementById("loginBtnContainer").style.display = "none";
-                            document.getElementById("userProfileSection").style.display = "flex";
-                            document.getElementById("displayUserName").textContent = currentUserName;
-                            updateTexts();
-                            if (allChats.length === 0) startNewChat();
+                            setLoggedInState();
                         }
                     });
                 }
@@ -316,6 +318,22 @@ function handleGoogleLogin() {
     } else {
         alert("Google Identity belum siap. Coba refresh halaman beberapa saat lagi.");
     }
+}
+
+function setLoggedInState() {
+    document.getElementById("loginBtnContainer").style.display = "none";
+    document.getElementById("userProfileSection").style.display = "flex";
+    document.getElementById("displayUserName").textContent = currentUserName;
+    
+    // Buka kunci input chat
+    const inputBox = document.getElementById("inputBoxContainer");
+    inputBox.style.opacity = "1";
+    inputBox.style.pointerEvents = "auto";
+    document.getElementById("userInput").disabled = false;
+    document.getElementById("sendBtn").disabled = false;
+
+    updateTexts();
+    if (allChats.length === 0) startNewChat();
 }
 
 function toggleSidebar() {
@@ -336,7 +354,6 @@ function updateTexts() {
     document.getElementById("historyLabel").textContent = t.history;
     document.getElementById("settingsMenuText").textContent = t.settings;
     document.getElementById("logoutBtnText").textContent = t.logout;
-    document.getElementById("userInput").placeholder = t.placeholder;
     document.getElementById("footerNoteText").textContent = t.footer;
     document.getElementById("setModalTitle").textContent = t.modalTitle;
     document.getElementById("setThemeLabel").textContent = t.themeLabel;
@@ -347,8 +364,12 @@ function updateTexts() {
     
     if (!currentUserName) {
         document.getElementById("welcomeGreeting").textContent = t.welcome;
+        document.getElementById("welcomeSub").textContent = t.welcomeSubLogin;
+        document.getElementById("userInput").placeholder = t.placeholderLogin;
     } else {
         document.getElementById("welcomeGreeting").textContent = currentLang === 'id' ? `Halo, ${currentUserName}! Ada yang bisa dibantu hari ini?` : `Hello, ${currentUserName}! How can I help you today?`;
+        document.getElementById("welcomeSub").textContent = "";
+        document.getElementById("userInput").placeholder = t.placeholderReady;
     }
 }
 
@@ -408,10 +429,7 @@ window.addEventListener("DOMContentLoaded", () => {
     const savedUser = localStorage.getItem("mulya_username");
     if (savedUser) {
         currentUserName = savedUser;
-        document.getElementById("loginBtnContainer").style.display = "none";
-        document.getElementById("userProfileSection").style.display = "flex";
-        document.getElementById("displayUserName").textContent = currentUserName;
-        updateTexts();
+        setLoggedInState();
     }
 });
 
@@ -420,11 +438,20 @@ function handleLogout() {
     localStorage.removeItem("mulya_username");
     document.getElementById("loginBtnContainer").style.display = "block";
     document.getElementById("userProfileSection").style.display = "none";
+    
+    // Kunci kembali input chat
+    const inputBox = document.getElementById("inputBoxContainer");
+    inputBox.style.opacity = "0.5";
+    inputBox.style.pointerEvents = "none";
+    document.getElementById("userInput").disabled = true;
+    document.getElementById("sendBtn").disabled = true;
+
     updateTexts();
     location.reload();
 }
 
 function startNewChat() {
+    if (!currentUserName) return;
     currentChatId = Date.now();
     const t = translations[currentLang];
     allChats.push({ id: currentChatId, title: t.newChatTitle, messages: [] });
@@ -505,6 +532,7 @@ function renderCurrentChat() {
 }
 
 function sendMessage() {
+    if (!currentUserName) return;
     const input = document.getElementById("userInput");
     const text = input.value.trim();
     if (!text) return;
@@ -590,8 +618,6 @@ function handleKey(e) {
 function escapeHtml(text) {
     return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
-
-startNewChat();
 </script>
 </body>
 </html>
