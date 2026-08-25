@@ -112,7 +112,6 @@ body { display: flex; height: 100vh; height: 100dvh; background-color: var(--bg-
 
 .input-area-wrapper { padding: 15px 15% 25px 15%; background: linear-gradient(180deg, rgba(0,0,0,0) 0%, var(--bg-color) 80%); }
 
-/* Upload Preview Box */
 #imagePreviewContainer { display: none; padding: 8px 12px; background: var(--input-bg); border-radius: 12px 12px 0 0; border: 1px solid var(--input-border); border-bottom: none; align-items: center; gap: 10px; max-width: fit-content; }
 #imagePreviewContainer img { width: 45px; height: 45px; object-fit: cover; border-radius: 6px; }
 #imagePreviewContainer span { font-size: 13px; color: var(--text-color); }
@@ -585,7 +584,7 @@ function sendMessage() {
 
     const userMessage = { 
         role: "user", 
-        content: text || (chatLang === "en" ? "What is in this image?" : "Apa isi dari gambar ini?"),
+        content: text || (chatLang === "en" ? "Please analyze this image and explain what is in it." : "Tolong analisis gambar ini dan jelaskan isinya."),
         imageUrl: selectedImageBase64 
     };
 
@@ -593,7 +592,6 @@ function sendMessage() {
     
     input.value = "";
     input.style.height = 'auto';
-    const tempImage = selectedImageBase64;
     removeSelectedImage();
     renderCurrentChat();
 
@@ -654,6 +652,8 @@ function sendMessage() {
             const aiReply = data.choices[0].message.content;
             currentChat.messages.push({ role: "assistant", content: aiReply });
             renderCurrentChat();
+        } else if (data.error) {
+            document.getElementById(aiId).querySelector(".bubble").textContent = "Error API: " + (data.error.message || t.error);
         } else {
             document.getElementById(aiId).querySelector(".bubble").textContent = t.error;
         }
