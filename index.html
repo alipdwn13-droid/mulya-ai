@@ -395,29 +395,21 @@ function sendMessage() {
 
     const currentChat = allChats.find(c => c.id === currentChatId);
     if (currentChat.messages.length === 0) {
-        let titleText = text || "Analisis Tugas";
+        let titleText = text || "Analisis Gambar";
         currentChat.title = titleText.length > 20 ? titleText.substring(0, 20) + "..." : titleText;
         renderHistoryList();
     }
 
-    // Jika user upload gambar, kita berikan instruksi teks pendukung supaya model teks paham
-    let finalPrompt = text;
-    if (hasImage && !text) {
-        finalPrompt = "Tolong berikan penjelasan dan kunci jawaban lengkap untuk latihan soal matematika yang ada pada gambar ini.";
-    } else if (hasImage && text) {
-        finalPrompt = text + " (Terkait soal pada gambar yang dilampirkan)";
-    }
-
     const userMessage = { 
         role: "user", 
-        content: finalPrompt,
+        content: text || "Tolong selesaikan dan berikan kunci jawaban untuk soal pada gambar ini.",
         imageUrl: selectedImageBase64 
     };
 
     currentChat.messages.push(userMessage);
     input.value = "";
     input.style.height = 'auto';
-    const imgToSend = selectedImageBase64;
+    const activeImage = selectedImageBase64;
     removeSelectedImage();
     renderCurrentChat();
 
@@ -426,17 +418,29 @@ function sendMessage() {
     historyDiv.innerHTML += `
         <div class="message-row ai" id="${aiId}">
             <div class="avatar ai-av">✨</div>
-            <div class="bubble">Berpikir & Memproses...</div>
+            <div class="bubble">Sedang membaca gambar & berpikir...</div>
         </div>`;
     historyDiv.scrollTop = historyDiv.scrollHeight;
 
     let roleInstruction = "Bertindaklah sebagai asisten AI pribadi yang cerdas.";
-    if (aiRole === "teacher") roleInstruction = "Bertindaklah sebagai Guru atau Mentor yang sabar dan membantu menjelaskan materi pelajaran.";
+    if (aiRole === "teacher") roleInstruction = "Bertindaklah sebagai Guru atau Mentor yang sabar dan membantu menjelaskan materi pelajaran sekolah secara lengkap.";
     else if (aiRole === "coder") roleInstruction = "Bertindaklah sebagai Ahli Pemrograman/Developer profesional.";
+
+    // Susun isi pesan multimodal (Vision) untuk OpenRouter (Gemini Flash)
+    let userContentArray = [];
+    let promptText = userMessage.content;
+    
+    userContentArray.push({ type: "text", text: promptText });
+    if (activeImage) {
+        userContentArray.push({
+            type: "image_url",
+            image_url: { url: activeImage }
+        });
+    }
 
     let apiMessages = [
         { role: "system", content: "Kamu harus selalu merespons menggunakan Bahasa Indonesia. " + roleInstruction },
-        { role: "user", content: finalPrompt }
+        { role: "user", content: userContentArray }
     ];
 
     fetch("https://openrouter.ai/api/v1/chat/completions", {
@@ -448,7 +452,7 @@ function sendMessage() {
             "X-Title": "Mulya AI"
         },
         body: JSON.stringify({ 
-            model: "openrouter/auto", 
+            model: "google/gemini-2.5-flash", 
             messages: apiMessages 
         })
     })
