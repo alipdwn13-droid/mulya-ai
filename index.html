@@ -105,23 +105,14 @@ body { display: flex; height: 100vh; height: 100dvh; background-color: var(--bg-
 .message-row.user .bubble { background: var(--user-bubble-bg); color: var(--user-bubble-text); padding: 10px 16px; border-radius: 16px; border-top-right-radius: 4px; max-width: 75%; word-break: break-word; white-space: pre-wrap; font-size: 15px; line-height: 1.6; }
 .message-row.ai .bubble { background: transparent; color: var(--text-color); padding: 0; width: 100%; word-break: break-word; white-space: pre-wrap; font-size: 15px; line-height: 1.6; }
 
-.ai-generated-image, .user-uploaded-image { max-width: 100%; max-height: 300px; border-radius: 12px; margin-top: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: block; object-fit: contain; }
+.ai-generated-image { max-width: 100%; max-height: 400px; border-radius: 12px; margin-top: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: block; object-fit: contain; }
 .download-img-btn { display: inline-block; margin-top: 8px; padding: 6px 14px; background: #4285f4; color: white; border-radius: 20px; font-size: 12px; text-decoration: none; font-weight: 500; }
 .download-img-btn:hover { opacity: 0.9; }
 
 .input-area-wrapper { padding: 15px 15% 25px 15%; background: linear-gradient(180deg, rgba(0,0,0,0) 0%, var(--bg-color) 80%); }
-.input-box-container { display: flex; flex-direction: column; background: var(--input-bg); border-radius: 24px; padding: 8px 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); border: 1px solid var(--input-border); }
-.input-box-container:focus-within { border-color: #4285f4; background: var(--input-focus-bg); box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
-
-.image-preview-container { display: none; align-items: center; gap: 10px; padding: 6px 8px; position: relative; width: fit-content; }
-.image-preview-container img { width: 60px; height: 60px; object-fit: cover; border-radius: 8px; border: 1px solid var(--sidebar-border); }
-.remove-img-btn { background: rgba(0,0,0,0.6); color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center; position: absolute; top: 2px; right: 2px; }
-
-.input-main-row { display: flex; align-items: center; gap: 8px; width: 100%; }
+.input-box { display: flex; align-items: center; background: var(--input-bg); border-radius: 30px; padding: 8px 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); border: 1px solid var(--input-border); }
+.input-box:focus-within { border-color: #4285f4; background: var(--input-focus-bg); box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
 textarea { flex: 1; background: transparent; border: none; outline: none; font-size: 15px; resize: none; max-height: 120px; color: var(--text-color); padding: 4px 6px; }
-
-.action-btn { background: transparent; border: none; color: var(--footer-text); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; flex-shrink: 0; font-size: 18px; }
-.action-btn:hover { background: var(--hover-bg); color: var(--text-color); }
 .send-btn { background: var(--text-color); color: var(--bg-color); border: none; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; flex-shrink: 0; }
 .send-btn:hover { opacity: 0.8; }
 .footer-note { font-size: 11px; color: var(--footer-text); text-align: center; margin-top: 8px; }
@@ -232,19 +223,9 @@ textarea { flex: 1; background: transparent; border: none; outline: none; font-s
     <div id="chat-history"></div>
 
     <div class="input-area-wrapper">
-        <div class="input-box-container" id="inputBoxContainer" style="opacity: 0.5; pointer-events: none;">
-            <!-- Area Preview Gambar Sebelum Kirim -->
-            <div class="image-preview-container" id="imagePreviewContainer">
-                <img id="imagePreview" src="" alt="Preview">
-                <button class="remove-img-btn" onclick="removeAttachedImage()">✕</button>
-            </div>
-            <div class="input-main-row">
-                <!-- Input File Tersembunyi -->
-                <input type="file" id="imageInput" accept="image/*" style="display: none;" onchange="handleImageSelect(event)">
-                <button class="action-btn" title="Upload Gambar" onclick="document.getElementById('imageInput').click()">📷</button>
-                <textarea id="userInput" placeholder="Silakan Login Google terlebih dahulu..." rows="1" disabled onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
-                <button class="send-btn" id="sendBtn" disabled onclick="sendMessage()">➤</button>
-            </div>
+        <div class="input-box" id="inputBoxContainer" style="opacity: 0.5; pointer-events: none;">
+            <textarea id="userInput" placeholder="Silakan Login Google terlebih dahulu..." rows="1" disabled onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+            <button class="send-btn" id="sendBtn" disabled onclick="sendMessage()">➤</button>
         </div>
         <div class="footer-note" id="footerNoteText">Mulya AI dapat menampilkan info yang tidak akurat. Verifikasi respons penting.</div>
     </div>
@@ -261,7 +242,6 @@ let currentLang = "id";
 let chatLang = "id";
 let aiRole = "general";
 let tokenClient;
-let attachedImageBase64 = null;
 
 const translations = {
     id: {
@@ -272,9 +252,9 @@ const translations = {
         welcome: "Perkenalkan Mulya AI, asisten AI pribadi Anda",
         welcomeSubLogin: "Silakan Login Google terlebih dahulu di pojok kanan atas untuk mulai menggunakan AI.",
         placeholderLogin: "Silakan Login Google terlebih dahulu...",
-        placeholderReady: "Kirim pesan atau upload gambar...",
+        placeholderReady: "Minta Mulya AI atau buat gambar (cth: buat gambar...)...",
         footer: "Mulya AI dapat menampilkan info yang tidak akurat. Verifikasi respons penting.",
-        thinking: "Berpikir & Menganalisis...",
+        thinking: "Berpikir & Memproses Gambar...",
         error: "Maaf, terjadi kesalahan.",
         connectionError: "Gagal terhubung.",
         modalTitle: "Pengaturan",
@@ -293,9 +273,9 @@ const translations = {
         welcome: "Meet Mulya AI, your personal assistant",
         welcomeSubLogin: "Please log in with Google at the top right to start using AI.",
         placeholderLogin: "Please log in with Google first...",
-        placeholderReady: "Send a message or upload an image...",
+        placeholderReady: "Ask Mulya AI or generate image (e.g., generate image...)....",
         footer: "Mulya AI may display inaccurate info. Verify important responses.",
-        thinking: "Thinking & Analyzing...",
+        thinking: "Thinking & Generating Image...",
         error: "Sorry, an error occurred.",
         connectionError: "Connection failed.",
         modalTitle: "Settings",
@@ -345,6 +325,7 @@ function setLoggedInState() {
     document.getElementById("userProfileSection").style.display = "flex";
     document.getElementById("displayUserName").textContent = currentUserName;
     
+    // Buka kunci input chat
     const inputBox = document.getElementById("inputBoxContainer");
     inputBox.style.opacity = "1";
     inputBox.style.pointerEvents = "auto";
@@ -365,24 +346,6 @@ function toggleSidebar() {
 function autoResize(textarea) {
     textarea.style.height = 'auto';
     textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
-}
-
-function handleImageSelect(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        attachedImageBase64 = e.target.result;
-        document.getElementById("imagePreview").src = attachedImageBase64;
-        document.getElementById("imagePreviewContainer").style.display = "flex";
-    };
-    reader.readAsDataURL(file);
-}
-
-function removeAttachedImage() {
-    attachedImageBase64 = null;
-    document.getElementById("imageInput").value = "";
-    document.getElementById("imagePreviewContainer").style.display = "none";
 }
 
 function updateTexts() {
@@ -476,6 +439,7 @@ function handleLogout() {
     document.getElementById("loginBtnContainer").style.display = "block";
     document.getElementById("userProfileSection").style.display = "none";
     
+    // Kunci kembali input chat
     const inputBox = document.getElementById("inputBoxContainer");
     inputBox.style.opacity = "0.5";
     inputBox.style.pointerEvents = "none";
@@ -540,17 +504,13 @@ function renderCurrentChat() {
 
     currentChat.messages.forEach(msg => {
         if (msg.role === "user") {
-            let imgTag = msg.imageUrl ? `<img src="${msg.imageUrl}" class="user-uploaded-image" alt="Uploaded Image" />` : "";
             historyDiv.innerHTML += `
                 <div class="message-row user">
-                    <div class="bubble">
-                        ${escapeHtml(msg.content)}
-                        ${imgTag}
-                    </div>
+                    <div class="bubble">${escapeHtml(msg.content)}</div>
                     <div class="avatar user-av">${currentUserName ? currentUserName.charAt(0).toUpperCase() : 'U'}</div>
                 </div>`;
         } else {
-            let contentHtml = "";
+            let contentHtml = msg.content;
             if (msg.isImage) {
                 contentHtml = `
                     <div>${escapeHtml(msg.textResponse)}</div>
@@ -575,33 +535,19 @@ function sendMessage() {
     if (!currentUserName) return;
     const input = document.getElementById("userInput");
     const text = input.value.trim();
-    const hasImage = attachedImageBase64 !== null;
-
-    if (!text && !hasImage) return;
+    if (!text) return;
 
     if (!currentChatId || allChats.length === 0) startNewChat();
 
     const currentChat = allChats.find(c => c.id === currentChatId);
     if (currentChat.messages.length === 0) {
-        const titleText = text || (hasImage ? "[Gambar]" : "Chat");
-        currentChat.title = titleText.length > 20 ? titleText.substring(0, 20) + "..." : titleText;
+        currentChat.title = text.length > 20 ? text.substring(0, 20) + "..." : text;
         renderHistoryList();
     }
 
-    // Simpan pesan user dengan image jika ada
-    const userMsg = { 
-        role: "user", 
-        content: text || (hasImage ? "Tolong jelaskan gambar ini." : ""), 
-        imageUrl: attachedImageBase64 
-    };
-    currentChat.messages.push(userMsg);
-
+    currentChat.messages.push({ role: "user", content: text });
     input.value = "";
     input.style.height = 'auto';
-    
-    // Reset preview gambar setelah kirim
-    let currentImg = attachedImageBase64;
-    removeAttachedImage();
     renderCurrentChat();
 
     const historyDiv = document.getElementById("chat-history");
@@ -615,9 +561,9 @@ function sendMessage() {
     historyDiv.scrollTop = historyDiv.scrollHeight;
 
     const lowerText = text.toLowerCase();
-    const isImageGenRequest = !currentImg && (lowerText.includes("buat gambar") || lowerText.includes("bikin gambar") || lowerText.includes("generate image") || lowerText.includes("lukiskan"));
+    const isImageRequest = lowerText.includes("buat gambar") || lowerText.includes("bikin gambar") || lowerText.includes("generate image") || lowerText.includes("lukiskan");
 
-    if (isImageGenRequest) {
+    if (isImageRequest) {
         let imagePrompt = text.replace(/buat gambar|bikin gambar|generate image|lukiskan/gi, "").trim();
         if (!imagePrompt) imagePrompt = text;
         let imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(imagePrompt)}?width=1024&height=1024&nologo=true`;
@@ -638,38 +584,17 @@ function sendMessage() {
     else if (aiRole === "audio_expert") roleInstruction = " Bertindaklah sebagai Ahli Sound System & Perangkat Audio Profesional.";
     else roleInstruction = " Bertindaklah sebagai Asisten AI pribadi yang cerdas dan serba bisa.";
 
-    // Susun payload pesan ke API OpenRouter (Mendukung Multi-modal Vision API)
-    let apiMessages = [{ role: "system", content: langInstruction + roleInstruction }];
-    
-    currentChat.messages.forEach(m => {
-        if (m.role === "user") {
-            if (m.imageUrl) {
-                apiMessages.push({
-                    role: "user",
-                    content: [
-                        { type: "text", text: m.content || "Jelaskan gambar ini." },
-                        { type: "image_url", image_url: { url: m.imageUrl } }
-                    ]
-                });
-            } else {
-                apiMessages.push({ role: "user", content: m.content });
-            }
-        } else if (m.role === "assistant" && !m.isImage) {
-            apiMessages.push({ role: "assistant", content: m.content });
-        }
-    });
-
     fetch("https://openrouter.ai/api/v1/chat/completions", {
         method: "POST",
         headers: { 
             "Authorization": "Bearer " + apiKey, 
             "Content-Type": "application/json",
-            "HTTP-Referer": window.location.,
+            "HTTP-Referer": window.location.href,
             "X-Title": "Mulya AI"
         },
         body: JSON.stringify({ 
-            model: "google/gemini-flash-1.5", // Model yang mendukung Vision & Chat
-            messages: apiMessages 
+            model: "openrouter/auto", 
+            messages: [{ role: "system", content: langInstruction + roleInstruction }, ...currentChat.messages.map(m => ({ role: m.role, content: m.content }))] 
         })
     })
     .then(res => res.json())
